@@ -382,12 +382,6 @@ else
 if(''==$path_array[1]){
 	$replace['title']='Главная - '.$replace['title'];
 	$replace['index_page_selected']=' selected';
-	$replace['head_addon'].='
-		<link rel="image_src" href="/meta-image.png"/>
-		<meta property="og:image" content="/meta-image.png"/>
-		<meta name="twitter:image" content="/meta-image.png"/>
-		<meta name="twitter:card" content="summary_large_image"/>
-	';
 	$th_sorted=' data-sorted="true" data-sorted-direction="descending"';
 	$dgp=$db->sql_row("SELECT * FROM `dgp_snapshot` ORDER BY `id` DESC LIMIT 1");
 	$dgp_json=json_decode($dgp['json'],true);
