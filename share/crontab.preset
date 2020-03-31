@@ -1,0 +1,10 @@
+4 0 * * * /bin/bash /root/reboot-services.sh
+0 0 * * * /usr/bin/php /var/www/vizplus/info.viz.plus/module/snapshot.php > /root/logs/snapshot.txt
+1 1 * * * /usr/bin/php /var/www/vizplus/info.viz.plus/module/backup.php > /root/logs/backup.txt
+
+*/5 * * * * /bin/bash /root/restart_irreversible_waterfall.sh
+*/5 * * * * /bin/bash /root/restart_props_snapshot.sh
+*/5 * * * * /bin/bash /root/restart_ops_processing.sh
+*/5 * * * * /bin/bash /root/restart_ops_linking.sh
+*/5 * * * * /bin/bash /root/restart_ops_working.sh
+*/5 * * * * /bin/bash /root/restart_updater.sh
