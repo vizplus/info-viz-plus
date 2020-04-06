@@ -26,46 +26,44 @@ if($lookup_witness){
 						print '<p>Статус: <span class="red">отключен</span></p>';
 					}
 					$witness_votes=$db->sql_row("SELECT SUM(`votes`) as `sum` FROM `witnesses_votes` WHERE `witness` = '".$witness['id']."'");
-					print '<p>Суммарный вес полученных голосов: <span class="view-tokens captions">'.(number_format($witness_votes['sum']/1000000,0,'.',' ')).' viz</span></p>';
+					print '<p>Суммарный вес полученных голосов: <span class="captions">'.(number_format($witness_votes['sum']/1000000,0,'.',' ')).' viz</span></p>';
 
 
 					print '<br><h3 class="left">Список проголосовавших</h3>';
 					$q=$db->sql("SELECT * FROM `witnesses_votes` WHERE `witness`='".$witness['id']."' AND `votes`>1000000 ORDER BY `votes` DESC");
 					while($m=$db->row($q)){
 						$voter=get_account_name($m['account']);
-						print '<p><a class="view-account captions" href="/accounts/'.$voter.'/">'.$voter.'</a> вес голоса: <span class="view-tokens captions">'.number_format($m['votes']/1000000,2,'.',' ').' viz</span></p>';
+						print '<p><a class="view-account captions" href="/accounts/'.$voter.'/">'.$voter.'</a> вес голоса: <span class="captions">'.number_format($m['votes']/1000000,2,'.',' ').' viz</span></p>';
 					}
 
 					print '<br><h3 class="left">Голосуемые параметры</h3>';
 					$props=json_decode($witness['props'],true);
 					print '
-					<p>Стоимость создания аккаунта: <span class="view-tokens captions">'.number_format($props['account_creation_fee'],2,'.',' ').' viz</span></p>
-					<p>Стоимость создания аккаунта делегированием: <span class="view-tokens captions">'.number_format(floatval($props['account_creation_fee'])*intval($props['create_account_delegation_ratio']),2,'.',' ').' viz</span></p>
-					<p>Срок делегирования при создании аккаунта: <span class="view-memo captions">'.(round($props['create_account_delegation_time']/86400,2)).' суток</span></p>
+					<p>Стоимость создания аккаунта: <span class="captions">'.number_format($props['account_creation_fee'],2,'.',' ').' viz</span></p>
+					<p>Стоимость создания аккаунта делегированием: <span class="captions">'.number_format(floatval($props['account_creation_fee'])*intval($props['create_account_delegation_ratio']),2,'.',' ').' viz</span></p>
+					<p>Срок делегирования при создании аккаунта: <span class="captions">'.(round($props['create_account_delegation_time']/86400,2)).' суток</span></p>
 					<hr>
-					<p>Резерв пропускной способности для микроаккаунтов: <span class="view-percent captions">'.$props['bandwidth_reserve_percent'].'%</span></p>
-					<p>Максимальный капитал микроаккаунта: <span class="view-tokens captions">'.number_format($props['bandwidth_reserve_below'],2,'.',' ').' viz</span></p>
+					<p>Резерв пропускной способности для микроаккаунтов: <span class="captions">'.$props['bandwidth_reserve_percent'].'%</span></p>
+					<p>Максимальный капитал микроаккаунта: <span class="captions">'.number_format($props['bandwidth_reserve_below'],2,'.',' ').' viz</span></p>
 					<hr>
-					<p>Дополнительная наценка пропускной способности за каждую data операцию в транзакции: <span class="view-percent captions">'.($props['data_operations_cost_additional_bandwidth']/2).'%</span></p>
+					<p>Дополнительная наценка пропускной способности за каждую data операцию в транзакции: <span class="captions">'.($props['data_operations_cost_additional_bandwidth']/2).'%</span></p>
 					<hr>
-					<p>Минимальное количество токенов при делегировании: <span class="view-tokens captions">'.number_format($props['min_delegation'],2,'.',' ').' viz</span></p>
+					<p>Минимальное количество токенов при делегировании: <span class="captions">'.number_format($props['min_delegation'],2,'.',' ').' viz</span></p>
 					<hr>
-					<p>Минимальный размер капитала награждающего аккаунта: <span class="view-tokens captions">'.number_format($props['vote_accounting_min_rshares']/1000000,2,'.',' ').' viz</span></p>
+					<p>Минимальный размер награждающего капитала: <span class="captions">'.number_format($props['vote_accounting_min_rshares']/1000000,2,'.',' ').' viz</span></p>
 					<hr>
-					<p>Максимальный размер блока: <span class="view-memo captions">'.$props['maximum_block_size'].' байт</span></p>
+					<p>Максимальный размер блока: <span class="captions">'.$props['maximum_block_size'].' байт</span></p>
 					<hr>
-					<p>Минимальная доля совокупного социального капитала для решения по заявке в Фонде ДАО: <span class="view-percent captions">'.($props['committee_request_approve_min_percent']/100).'%</span></p>
+					<p>Минимальная доля совокупного социального капитала для решения по заявке в Фонде ДАО: <span class="captions">'.($props['committee_request_approve_min_percent']/100).'%</span></p>
 					<hr>
-					<p>Штраф делегату за пропуск блока (% от суммарного веса голосов за делегата): <span class="view-percent captions">'.($props['account_creation_fee']/100).'%</span></p>
-					<p>Продолжительность штрафа делегату за пропуск блока: <span class="view-memo captions">'.(round($props['witness_miss_penalty_duration']/86400,2)).' суток</span>
+					<p>Штраф делегату за пропуск блока (% от суммарного веса голосов за делегата): <span class="captions">'.($props['account_creation_fee']/100).'%</span></p>
+					<p>Продолжительность штрафа делегату за пропуск блока: <span class="captions">'.(round($props['witness_miss_penalty_duration']/86400,2)).' суток</span>
 					</p>';
 					print '<hr>
 					<p><strong>Распределение эмиссии</strong></p>
-					<p>Фонд наград: <span class="view-percent captions">'.(100-($props['inflation_witness_percent']/100)-((10000-$props['inflation_witness_percent'])/100)/(10000/$props['inflation_ratio_committee_vs_reward_fund'])).'%</span></p>
-					<p>Фонд ДАО: <span class="view-percent captions">'.(((10000-$props['inflation_witness_percent'])/100)/(10000/$props['inflation_ratio_committee_vs_reward_fund'])).'%</span></p>
-					<p>Фонд делегатов: <span class="view-percent captions">'.($props['inflation_witness_percent']/100).'%</span></p>';
-
-
+					<p>Фонд наград: <span class="captions">'.(100-($props['inflation_witness_percent']/100)-((10000-$props['inflation_witness_percent'])/100)/(10000/$props['inflation_ratio_committee_vs_reward_fund'])).'%</span></p>
+					<p>Фонд ДАО: <span class="captions">'.(((10000-$props['inflation_witness_percent'])/100)/(10000/$props['inflation_ratio_committee_vs_reward_fund'])).'%</span></p>
+					<p>Фонд делегатов: <span class="captions">'.($props['inflation_witness_percent']/100).'%</span></p>';
 			print '</div>
 				</div>
 			</div>';
@@ -118,7 +116,7 @@ else{
 	<tr>
 		<th data-sorted="true" data-sorted-direction="descending" data-field="num" data-sortable-type="int">#</th>
 		<th data-field="account">Делегат</th>
-		<th title="Суммарный передаваемый вес голосов от участников сети" data-field="votes">Вес голосов</th>
+		<th title="Суммарный передаваемый вес голосов от участников сети" data-field="votes" class="text-right">Вес голосов</th>
 		<th title="Используемая версия протокола" data-field="version">Версия</th>
 		<th title="Штраф за пропущенные блоки влияют на учитываемый вес голосов" data-field="penalty" class="from-selector hidden">Штраф</th>
 		<th title="Количество подписанных блоков" data-field="blocks" class="from-selector hidden">Блоков</th>
@@ -163,7 +161,7 @@ else{
 		<tr'.($active?'':' class="inactive"').'>
 			<td data-value="'.($i).'">'.($active?($num<=11?'<strong>'.$num.'</strong>':$num):'&mdash;').'</td>
 			<td data-value="'.$account_name.'"><a href="/witnesses/'.$account_name.'/">'.$account_name.'</a></td>
-			<td data-value="'.$m['votes'].'">'.number_format($m['votes']/1000000,0,'.',' ').'</td>
+			<td data-value="'.$m['votes'].'" class="text-right">'.number_format($m['votes']/1000000,0,'.',' ').'</td>
 			<td data-value="'.(str_replace('.','',$m['running_version'])).'"'.($hardfork_version_upgrade?' title="Голосует за активацию версии '.$m['hardfork_version_vote'].'" class="positive-color"':'').'>'.$m['running_version'].'</td>
 			<td data-field="penalty" data-value="'.$m['penalty_percent'].'" class="from-selector hidden">'.($m['penalty_percent']/100).'%</td>
 			<td data-field="blocks" class="from-selector hidden">'.$m['blocks'].'</td>
