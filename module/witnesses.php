@@ -46,7 +46,7 @@ if($lookup_witness){
 					<p>Резерв пропускной способности для микроаккаунтов: <span class="captions">'.$props['bandwidth_reserve_percent'].'%</span></p>
 					<p>Максимальный капитал микроаккаунта: <span class="captions">'.number_format($props['bandwidth_reserve_below'],2,'.',' ').' viz</span></p>
 					<hr>
-					<p>Дополнительная наценка пропускной способности за каждую data операцию в транзакции: <span class="captions">'.($props['data_operations_cost_additional_bandwidth']/2).'%</span></p>
+					<p>Дополнительная наценка пропускной способности за каждую data операцию в транзакции: <span class="captions">'.round($props['data_operations_cost_additional_bandwidth']/100,2).'%</span></p>
 					<hr>
 					<p>Минимальное количество токенов при делегировании: <span class="captions">'.number_format($props['min_delegation'],2,'.',' ').' viz</span></p>
 					<hr>
@@ -54,16 +54,16 @@ if($lookup_witness){
 					<hr>
 					<p>Максимальный размер блока: <span class="captions">'.$props['maximum_block_size'].' байт</span></p>
 					<hr>
-					<p>Минимальная доля совокупного социального капитала для решения по заявке в Фонде ДАО: <span class="captions">'.($props['committee_request_approve_min_percent']/100).'%</span></p>
+					<p>Минимальная доля совокупного социального капитала для решения по заявке в Фонде ДАО: <span class="captions">'.round($props['committee_request_approve_min_percent']/100,2).'%</span></p>
 					<hr>
-					<p>Штраф делегату за пропуск блока (% от суммарного веса голосов за делегата): <span class="captions">'.($props['account_creation_fee']/100).'%</span></p>
+					<p>Штраф делегату за пропуск блока (% от суммарного веса голосов за делегата): <span class="captions">'.round($props['witness_miss_penalty_percent']/100,2).'%</span></p>
 					<p>Продолжительность штрафа делегату за пропуск блока: <span class="captions">'.(round($props['witness_miss_penalty_duration']/86400,2)).' суток</span>
 					</p>';
 					print '<hr>
 					<p><strong>Распределение эмиссии</strong></p>
-					<p>Фонд наград: <span class="captions">'.(100-($props['inflation_witness_percent']/100)-((10000-$props['inflation_witness_percent'])/100)/(10000/$props['inflation_ratio_committee_vs_reward_fund'])).'%</span></p>
-					<p>Фонд ДАО: <span class="captions">'.(((10000-$props['inflation_witness_percent'])/100)/(10000/$props['inflation_ratio_committee_vs_reward_fund'])).'%</span></p>
-					<p>Фонд делегатов: <span class="captions">'.($props['inflation_witness_percent']/100).'%</span></p>';
+					<p>Фонд наград: <span class="captions">'.round(100-($props['inflation_witness_percent']/100)-((10000-$props['inflation_witness_percent'])/100)/(10000/$props['inflation_ratio_committee_vs_reward_fund']),2).'%</span></p>
+					<p>Фонд ДАО: <span class="captions">'.round(((10000-$props['inflation_witness_percent'])/100)/(10000/$props['inflation_ratio_committee_vs_reward_fund']),2).'%</span></p>
+					<p>Фонд делегатов: <span class="captions">'.round($props['inflation_witness_percent']/100,2).'%</span></p>';
 			print '</div>
 				</div>
 			</div>';
@@ -163,7 +163,7 @@ else{
 			<td data-value="'.$account_name.'"><a href="/witnesses/'.$account_name.'/">'.$account_name.'</a></td>
 			<td data-value="'.$m['votes'].'" class="text-right">'.number_format($m['votes']/1000000,0,'.',' ').'</td>
 			<td data-value="'.(str_replace('.','',$m['running_version'])).'"'.($hardfork_version_upgrade?' title="Голосует за активацию версии '.$m['hardfork_version_vote'].'" class="positive-color"':'').'>'.$m['running_version'].'</td>
-			<td data-field="penalty" data-value="'.$m['penalty_percent'].'" class="from-selector hidden">'.($m['penalty_percent']/100).'%</td>
+			<td data-field="penalty" data-value="'.$m['penalty_percent'].'" class="from-selector hidden">'.round($m['penalty_percent']/100,2).'%</td>
 			<td data-field="blocks" class="from-selector hidden">'.$m['blocks'].'</td>
 			<td data-field="total_missed"  data-value="'.$total_missed_percent.'" class="from-selector hidden">'.$total_missed_percent.'% ('.$m['total_missed'].')</td>
 			<td data-field="rewards" data-value="'.$m['rewards'].'" class="from-selector hidden">'.number_format($m['rewards']/1000000,2,'.',' ').' viz</td>
@@ -175,17 +175,17 @@ else{
 			<td data-field="create_account_delegation_time" class="from-selector hidden">'.$props['create_account_delegation_time'].'</td>
 			<td data-field="min_delegation" data-value="'.intval(1000*floatval($props['min_delegation'])).'" class="from-selector hidden">'.number_format(floatval($props['account_creation_fee']),2,'.',' ').' viz</td>
 
-			<td data-field="bandwidth_reserve_percent" data-value="'.$props['bandwidth_reserve_percent'].'" class="from-selector hidden">'.number_format($props['bandwidth_reserve_percent']/100,2).'%</td>
-			<td data-field="bandwidth_reserve_below" data-value="'.$props['bandwidth_reserve_below'].'" class="from-selector hidden">'.number_format($props['bandwidth_reserve_below']/1000000,2,'.',' ').' viz</td>
+			<td data-field="bandwidth_reserve_percent" data-value="'.$props['bandwidth_reserve_percent'].'" class="from-selector hidden">'.round($props['bandwidth_reserve_percent']/100,2).'%</td>
+			<td data-field="bandwidth_reserve_below" data-value="'.$props['bandwidth_reserve_below'].'" class="from-selector hidden">'.number_format($props['bandwidth_reserve_below'],2,'.',' ').' viz</td>
 			<td data-field="vote_accounting_min_rshares" class="from-selector hidden">'.$props['vote_accounting_min_rshares'].'</td>
-			<td data-field="committee_request_approve_min_percent" data-value="'.$props['committee_request_approve_min_percent'].'" class="from-selector hidden">'.number_format($props['committee_request_approve_min_percent']/100,2).'%</td>
+			<td data-field="committee_request_approve_min_percent" data-value="'.$props['committee_request_approve_min_percent'].'" class="from-selector hidden">'.round($props['committee_request_approve_min_percent']/100,2).'%</td>
 
-			<td data-field="inflation_witness_percent" data-value="'.$props['inflation_witness_percent'].'" class="from-selector hidden">'.number_format($props['inflation_witness_percent']/100,2).'%</td>
-			<td data-field="inflation_ratio_committee_vs_reward_fund" data-value="'.$props['inflation_ratio_committee_vs_reward_fund'].'" class="from-selector hidden">'.number_format($props['inflation_ratio_committee_vs_reward_fund']/100,2).'%</td>
+			<td data-field="inflation_witness_percent" data-value="'.$props['inflation_witness_percent'].'" class="from-selector hidden">'.round($props['inflation_witness_percent']/100,2).'%</td>
+			<td data-field="inflation_ratio_committee_vs_reward_fund" data-value="'.$props['inflation_ratio_committee_vs_reward_fund'].'" class="from-selector hidden">'.round($props['inflation_ratio_committee_vs_reward_fund']/100,2).'%</td>
 			<td data-field="inflation_recalc_period" class="from-selector hidden">'.$props['inflation_recalc_period'].'</td>
 
-			<td data-field="data_operations_cost_additional_bandwidth" data-value="'.$props['data_operations_cost_additional_bandwidth'].'" class="from-selector hidden">'.number_format($props['data_operations_cost_additional_bandwidth']/100,2).'%</td>
-			<td data-field="witness_miss_penalty_percent" class="from-selector hidden">'.number_format($props['witness_miss_penalty_percent']/100,2).'%</td>
+			<td data-field="data_operations_cost_additional_bandwidth" data-value="'.$props['data_operations_cost_additional_bandwidth'].'" class="from-selector hidden">'.round($props['data_operations_cost_additional_bandwidth']/100,2).'%</td>
+			<td data-field="witness_miss_penalty_percent" class="from-selector hidden">'.round($props['witness_miss_penalty_percent']/100,2).'%</td>
 			<td data-field="witness_miss_penalty_duration" class="from-selector hidden">'.$props['witness_miss_penalty_duration'].'</td>
 		</tr>';
 		if($active){
