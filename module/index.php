@@ -27,7 +27,7 @@ if('props'==$path_array[1]){
 			'maximum_block_size'=>'Максимальный размер блока (байт)',
 			'data_operations_cost_additional_bandwidth'=>'Дополнительная наценка пропускной способности за каждую data операцию в транзакции (%)',
 			'min_delegation'=>'Минимальное количество токенов при делегировании (viz)',
-			'vote_accounting_min_rshares'=>'Минимальный размер капитала награждающего аккаунта (viz)',
+			'vote_accounting_min_rshares'=>'Минимальный размер награждающего капитала (viz)',
 			'committee_request_approve_min_percent'=>'Минимальная доля совокупного социального капитала для решения по заявке в Фонде ДАО (%)',
 			'witness_miss_penalty_percent'=>'Штраф делегату за пропуск блока (% суммарного веса голосов за делегата)',
 			'witness_miss_penalty_duration'=>'Продолжительность штрафа делегату за пропуск блока (суток)',
@@ -217,64 +217,50 @@ if('props'==$path_array[1]){
 
 			if('maximum_block_size'==$prop){
 				$new_value=$chain_props['maximum_block_size'];
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.'</td></tr>';
 			}
 			if('account_creation_fee'==$prop){
 				$new_value=short_viz($chain_props['account_creation_fee']/1000,true);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.'</td></tr>';
 			}
 			if('create_account_delegation_ratio'==$prop){
 				$new_value=short_viz($chain_props['account_creation_fee']*$chain_props['create_account_delegation_ratio']/1000,true);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.'</td></tr>';
 			}
 			if('create_account_delegation_time'==$prop){
 				$new_value=($chain_props['create_account_delegation_time']/3600/24);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.' сут.</td></tr>';
 			}
 			if('bandwidth_reserve_percent'==$prop){
 				$new_value=round($chain_props['bandwidth_reserve_percent']/10000,2);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.'%</td></tr>';
 			}
 			if('bandwidth_reserve_below'==$prop){
 				$new_value=short_viz($chain_props['bandwidth_reserve_below']/1000000,true);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.'</td></tr>';
 			}
 			if('data_operations_cost_additional_bandwidth'==$prop){
 				$new_value=round($chain_props['data_operations_cost_additional_bandwidth']/10000);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.'%</td></tr>';
 			}
 			if('min_delegation'==$prop){
 				$new_value=short_viz($chain_props['min_delegation']/1000,true);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.'</td></tr>';
 			}
 			if('vote_accounting_min_rshares'==$prop){
 				$new_value=short_viz($chain_props['vote_accounting_min_rshares']/1000000,true);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.'</td></tr>';
 			}
 			if('committee_request_approve_min_percent'==$prop){
 				$new_value=round($chain_props['committee_request_approve_min_percent']/100);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.'%</td></tr>';
 			}
 			if('witness_miss_penalty_percent'==$prop){
 				$new_value=round($chain_props['witness_miss_penalty_percent']/100);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.'%</td></tr>';
 			}
 			if('inflation_witness_percent'==$prop){
 				$new_value=round($chain_props['inflation_witness_percent']/100);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.'%</td></tr>';
 			}
 			if('inflation_ratio_committee_vs_reward_fund'==$prop){
 				$new_value=round($chain_props['inflation_ratio_committee_vs_reward_fund']/100);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.'%</td></tr>';
 			}
 			if('witness_miss_penalty_duration'==$prop){
 				$new_value=($chain_props['witness_miss_penalty_duration']/3600/24);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.' сут.</td></tr>';
 			}
 			if('inflation_recalc_period'==$prop){
 				$new_value=($chain_props['inflation_recalc_period']*3/3600/24);
-				$table_item='<tr><td>'.date('d.m.Y H:i:s',$chain_props['time']).' GMT</td><td>'.$new_value.' сут.</td></tr>';
 			}
+			$table_item='<tr><td>'.date('d.m.Y H:i:s',$new_time).' GMT</td><td>'.$new_value.('%'==$props_list_item[$prop]?$props_list_item[$prop]:' '.$props_list_item[$prop]).'</td></tr>';
 			if(0==$num){
 				$prev_value=$new_value;
 				$prev_time=$new_time;
@@ -282,20 +268,16 @@ if('props'==$path_array[1]){
 			}
 			if($prev_value!=$new_value){
 				$change=true;
-				/* work if select order ascending */
-				if($prev_time<($new_time-3)){
-					$charts_arr[]=[($new_time-3)*1000,floatval($prev_value)];
-				}
-				/* work if select order descending */
 				if(($prev_time-3)>$new_time){
-					$charts_arr[]=[($prev_time-3)*1000,floatval($new_value)];
+					$charts_arr[]=[($new_time+3)*1000,floatval($prev_value)];
+					$old_table_item='<tr><td>'.date('d.m.Y H:i:s',$new_time+3).' GMT</td><td>'.$prev_value.('%'==$props_list_item[$prop]?$props_list_item[$prop]:' '.$props_list_item[$prop]).'</td></tr>';
+					$table_str.=$old_table_item;
 				}
-
+			}
+			if($change){
 				$prev_value=$new_value;
 				$prev_time=$new_time;
 				$charts_arr[]=[($prev_time)*1000,floatval($prev_value)];
-			}
-			if($change){
 				$table_str.=$table_item;
 			}
 			$change=false;
@@ -438,7 +420,7 @@ if(''==$path_array[1]){
 		},
 		colors:['#0071d2','#389bf1','#67b8ff','#9dd1ff'],
 		title: {
-			text: 'Активность аккаунтов'
+			text: 'Количество активных аккаунтов'
 		},
 		xAxis: {
 			type: 'datetime'
@@ -450,9 +432,9 @@ if(''==$path_array[1]){
 			opposite: true,
 		},
 		legend: {
-			layout: 'vertical',
-			align: 'right',
-			verticalAlign: 'middle'
+			layout: 'horizontal',//'vertical',
+			align: 'center',//'right',
+			verticalAlign: 'top',//'middle'
 		},
 		tooltip: {
 			/*headerFormat: '<b>{series.name}</b><br/>',
@@ -477,7 +459,7 @@ if(''==$path_array[1]){
 						legend: {
 							layout: 'horizontal',
 							align: 'center',
-							verticalAlign: 'bottom'
+							verticalAlign: 'top'
 						}
 					}
 				}]
@@ -631,7 +613,7 @@ if(''==$path_array[1]){
 		},
 		colors:['#0071d2','#389bf1','#67b8ff','#9dd1ff'],
 		title: {
-			text: 'Транзакций'
+			text: 'Количество транзакций'
 		},
 		xAxis: {
 			type: 'datetime'
@@ -643,9 +625,9 @@ if(''==$path_array[1]){
 			opposite: true,
 		},
 		legend: {
-			layout: 'vertical',
-			align: 'right',
-			verticalAlign: 'middle'
+			layout: 'horizontal',//'vertical',
+			align: 'center',//'right',
+			verticalAlign: 'top',//'middle'
 		},
 		tooltip: {
 			xDateFormat:'%d.%m.%Y %H:%M:%S GMT',
@@ -668,7 +650,7 @@ if(''==$path_array[1]){
 						legend: {
 							layout: 'horizontal',
 							align: 'center',
-							verticalAlign: 'bottom'
+							verticalAlign: 'top'
 						}
 					}
 				}]
@@ -753,8 +735,8 @@ if(''==$path_array[1]){
 	print '<thead>';
 	print '
 	<tr>
-		<th>Аккаунты</th>
-		<th class="text-right">Количество</th>
+		<th>Период</th>
+		<th class="text-right">Аккаунты</th>
 	</tr>';
 	print '</thead>';
 	print '<tbody>';
@@ -771,7 +753,7 @@ if(''==$path_array[1]){
 	print '
 	<tr>
 		<th>Блоки</th>
-		<th>Значение</th>
+		<th width="40%">Значение</th>
 	</tr>';
 	print '</thead>';
 	print '<tbody>';
@@ -834,7 +816,7 @@ if(''==$path_array[1]){
 	print '
 	<tr>
 		<th>Эмиссия</th>
-		<th>Значение</th>
+		<th width="40%">Значение</th>
 	</tr>';
 	print '</thead>';
 	print '<tbody>';
@@ -853,7 +835,7 @@ if(''==$path_array[1]){
 	print '<tr><td>Фонд ДАО</td><td>'.round(((10000 - $dgp['inflation_witness_percent'])*$dgp['inflation_ratio']/10000) /100,2).'%</td></tr>';
 	print '<tr><td>Делегаты</td><td>'.round($dgp['inflation_witness_percent']/100,2).'%</td></tr>';
 	print '<tr><td class="nowrap">Срок фиксации</td><td>'.round($chain_props['inflation_recalc_period']*3/3600/24,2).' сут.</td></tr>';
-	print '<tr><td class="nowrap">Пересчёт распределения</td><td class="nowrap">'.date('d.m.Y H:i:s',($dgp['time']+($dgp_json['inflation_calc_block_num']+$chain_props['inflation_recalc_period']-$dgp['head_block_number']*3))).' GMT</td></tr>';
+	print '<tr><td class="nowrap">Пересчёт распределения</td><td class="nowrap">'.date('d.m.y H:i',($dgp['time']+($dgp_json['inflation_calc_block_num']+$chain_props['inflation_recalc_period']-$dgp['head_block_number']*3))).' GMT</td></tr>';
 	print '<tr><td class="nowrap"><strong>Всего в год</strong></td><td><strong>'.short_viz($emission/1000,true).'</strong></td></tr>';
 	print '</tbody></table>';
 	print '</div>';
@@ -908,7 +890,7 @@ if(''==$path_array[1]){
 	<td><a href="/props/data_operations_cost_additional_bandwidth/">'.round($chain_props['data_operations_cost_additional_bandwidth']/10000).'%</a></td></tr>';
 	print '<tr><td>Минимальное количество токенов при делегировании</td>
 	<td><a href="/props/min_delegation/">'.short_viz($chain_props['min_delegation']/1000,true).'</a></td></tr>';
-	print '<tr><td>Минимальный размер капитала награждающего аккаунта</td>
+	print '<tr><td>Минимальный размер награждающего капитала</td>
 	<td><a href="/props/vote_accounting_min_rshares/">'.short_viz($chain_props['vote_accounting_min_rshares']/1000000,true).'</a></td></tr>';
 	print '<tr><td>Минимальная доля совокупного социального капитала для решения по заявке в Фонде ДАО</td>
 	<td><a href="/props/committee_request_approve_min_percent/">'.round($chain_props['committee_request_approve_min_percent']/100).'%</a></td></tr>';
