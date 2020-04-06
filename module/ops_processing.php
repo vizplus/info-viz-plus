@@ -272,7 +272,7 @@ while($work){
 					$db->sql("UPDATE `accounts` SET `update`=1 WHERE `id`='".$beneficiaries_account_id."'");
 				}
 			}
-			$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."' WHERE `id`='".$account_id."'");
+			$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."', `update`=1 WHERE `id`='".$account_id."'");
 			$db->sql("UPDATE `accounts` SET `update`=1 WHERE `id`='".$target_id."'");
 			$db->sql("UPDATE `ops` SET `initiator`='".$account_id."', `target`='".$target_id."', `memo`='".$memo."' WHERE `id`='".$op_arr['id']."'");
 		}
