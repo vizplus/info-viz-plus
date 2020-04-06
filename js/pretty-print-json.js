@@ -4,6 +4,7 @@ const prettyPrintJson = {
    toHtml(thing, options) {
       const op_type_witnesses_keys={
       	'witness_reward':['witness'],
+      	'account_witness_vote':['witness'],
       };
       const op_type_accounts_keys={
       	'award':['initiator','receiver'],
@@ -11,6 +12,21 @@ const prettyPrintJson = {
       	'receive_award':['initiator','receiver'],
       	'account_metadata':['account'],
       	'transfer':['from','to'],
+      	'transfer_to_vesting':['from','to'],
+      	'withdraw_vesting':['account'],
+      	'delegate_vesting_shares':['delegator','delegatee'],
+      	'create_invite':['creator'],
+      	'claim_invite_balance':['initiator','receiver'],
+      	'committee_worker_create_request':['creator','worker'],
+      	'committee_vote_request':['voter'],
+      	'account_witness_vote':['account'],
+      	'account_create':['creator','new_account_name'],
+      	'set_account_price':['account','account_seller'],
+      	'set_subaccount_price':['account','subaccount_seller'],
+      	'buy_account':['buyer','account'],
+      	'account_sale':['account'],
+      	'paid_subscribe':['subscriber','account'],
+      	'paid_subscription_action':['subscriber','account'],
       };
       const defaults = { indent: 4, quoteKeys: false, escapeHtml: false, type:false };
       const settings = Object.assign(defaults, options);
