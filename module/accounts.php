@@ -54,19 +54,26 @@ if($lookup_account){
 		if(isset($json['profile']['services'])){
 			print '<p class="grey small captions">Контакты: ';
 			if(isset($json['profile']['services']['facebook'])){
+				$json['profile']['services']['facebook']=str_replace('https://www.facebook.com/','',$json['profile']['services']['facebook']);
 				print '<a href="/go/?url=https://www.facebook.com/'.htmlspecialchars($json['profile']['services']['facebook']).'" target="_blank" class="icon-link"><img src="/facebook.svg" class="icon-16" alt="Facebook" title="Facebook"></a>';
 			}
 			if(isset($json['profile']['services']['instagram'])){
+				$json['profile']['services']['instagram']=str_replace('https://www.instagram.com/','',$json['profile']['services']['instagram']);
 				print '<a href="/go/?url=https://www.instagram.com/'.htmlspecialchars($json['profile']['services']['instagram']).'" target="_blank" class="icon-link"><img src="/instagram.svg" class="icon-16" alt="Instagram" title="Instagram"></a>';
 			}
 			if(isset($json['profile']['services']['twitter'])){
+				$json['profile']['services']['twitter']=str_replace('https://twitter.com/','',$json['profile']['services']['twitter']);
 				print '<a href="/go/?url=https://twitter.com/'.htmlspecialchars($json['profile']['services']['twitter']).'" target="_blank" class="icon-link"><img src="/twitter.svg" class="icon-16" alt="Twitter" title="Twitter"></a>';
 			}
 			if(isset($json['profile']['services']['vk'])){
+				$json['profile']['services']['vk']=str_replace('https://vk.com/','',$json['profile']['services']['vk']);
 				print '<a href="/go/?url=https://vk.com/'.htmlspecialchars($json['profile']['services']['vk']).'" target="_blank" class="icon-link"><img src="/vk.svg" class="icon-16" alt="Вконтакте" title="Вконтакте"></a>';
 			}
 			if(isset($json['profile']['services']['telegram'])){
-				print '<a href="tg://resolve?domain='.htmlspecialchars($json['profile']['services']['telegram']).'" target="_blank" class="icon-link"><img src="/telegram.svg" class="icon-16" alt="Telegram" title="Telegram"></a>';
+				if('@'==substr($json['profile']['services']['telegram'],0,1)){
+					$json['profile']['services']['telegram']=substr($json['profile']['services']['telegram'],1);
+				}
+				print '<a href="tg://resolve?domain='.htmlspecialchars($json['profile']['services']['telegram']).'" class="icon-link"><img src="/telegram.svg" class="icon-16" alt="Telegram" title="Telegram"></a>';
 			}
 			if(isset($json['profile']['services']['skype'])){
 				print '<a href="skype:'.htmlspecialchars($json['profile']['services']['skype']).'?call" target="_blank" class="icon-link"><img src="/skype.svg" class="icon-16" alt="Skype" title="Skype"></a>';
