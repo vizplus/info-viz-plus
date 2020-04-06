@@ -82,7 +82,7 @@ if('props'==$path_array[1]){
 			$current_value=short_viz($chain_props['bandwidth_reserve_below']/1000000,false);
 		}
 		if('data_operations_cost_additional_bandwidth'==$prop){
-			$current_value=round($chain_props['data_operations_cost_additional_bandwidth']/10000);
+			$current_value=round($chain_props['data_operations_cost_additional_bandwidth']/100);
 		}
 		if('min_delegation'==$prop){
 			$current_value=short_viz($chain_props['min_delegation']/1000,false);
@@ -91,16 +91,16 @@ if('props'==$path_array[1]){
 			$current_value=short_viz($chain_props['vote_accounting_min_rshares']/1000000,false);
 		}
 		if('committee_request_approve_min_percent'==$prop){
-			$current_value=round($chain_props['committee_request_approve_min_percent']/100);
+			$current_value=round($chain_props['committee_request_approve_min_percent']/100,2);
 		}
 		if('witness_miss_penalty_percent'==$prop){
-			$current_value=round($chain_props['witness_miss_penalty_percent']/100);
+			$current_value=round($chain_props['witness_miss_penalty_percent']/100,2);
 		}
 		if('inflation_witness_percent'==$prop){
-			$current_value=round($chain_props['inflation_witness_percent']/100);
+			$current_value=round($chain_props['inflation_witness_percent']/100,2);
 		}
 		if('inflation_ratio_committee_vs_reward_fund'==$prop){
-			$current_value=round($chain_props['inflation_ratio_committee_vs_reward_fund']/100);
+			$current_value=round($chain_props['inflation_ratio_committee_vs_reward_fund']/100,2);
 		}
 		if('witness_miss_penalty_duration'==$prop){
 			$current_value=($chain_props['witness_miss_penalty_duration']/3600/24);
@@ -149,7 +149,7 @@ if('props'==$path_array[1]){
 				$view_value=short_viz($raw_value/1000000,false);
 			}
 			if('data_operations_cost_additional_bandwidth'==$prop){
-				$view_value=round($raw_value/10000);
+				$view_value=round($raw_value/100,2);
 			}
 			if('min_delegation'==$prop){
 				$raw_value=floatval($raw_value)*1000;
@@ -159,16 +159,16 @@ if('props'==$path_array[1]){
 				$view_value=short_viz($raw_value/1000000,false);
 			}
 			if('committee_request_approve_min_percent'==$prop){
-				$view_value=round($raw_value/100);
+				$view_value=round($raw_value/100,2);
 			}
 			if('witness_miss_penalty_percent'==$prop){
-				$view_value=round($raw_value/100);
+				$view_value=round($raw_value/100,2);
 			}
 			if('inflation_witness_percent'==$prop){
-				$view_value=round($raw_value/100);
+				$view_value=round($raw_value/100,2);
 			}
 			if('inflation_ratio_committee_vs_reward_fund'==$prop){
-				$view_value=round($raw_value/100);
+				$view_value=round($raw_value/100,2);
 			}
 			if('witness_miss_penalty_duration'==$prop){
 				$view_value=($raw_value/3600/24);
@@ -228,13 +228,13 @@ if('props'==$path_array[1]){
 				$new_value=($chain_props['create_account_delegation_time']/3600/24);
 			}
 			if('bandwidth_reserve_percent'==$prop){
-				$new_value=round($chain_props['bandwidth_reserve_percent']/10000,2);
+				$new_value=round($chain_props['bandwidth_reserve_percent']/100,2);
 			}
 			if('bandwidth_reserve_below'==$prop){
 				$new_value=short_viz($chain_props['bandwidth_reserve_below']/1000000,true);
 			}
 			if('data_operations_cost_additional_bandwidth'==$prop){
-				$new_value=round($chain_props['data_operations_cost_additional_bandwidth']/10000);
+				$new_value=round($chain_props['data_operations_cost_additional_bandwidth']/100,2);
 			}
 			if('min_delegation'==$prop){
 				$new_value=short_viz($chain_props['min_delegation']/1000,true);
@@ -243,16 +243,16 @@ if('props'==$path_array[1]){
 				$new_value=short_viz($chain_props['vote_accounting_min_rshares']/1000000,true);
 			}
 			if('committee_request_approve_min_percent'==$prop){
-				$new_value=round($chain_props['committee_request_approve_min_percent']/100);
+				$new_value=round($chain_props['committee_request_approve_min_percent']/100,2);
 			}
 			if('witness_miss_penalty_percent'==$prop){
-				$new_value=round($chain_props['witness_miss_penalty_percent']/100);
+				$new_value=round($chain_props['witness_miss_penalty_percent']/100,2);
 			}
 			if('inflation_witness_percent'==$prop){
-				$new_value=round($chain_props['inflation_witness_percent']/100);
+				$new_value=round($chain_props['inflation_witness_percent']/100,2);
 			}
 			if('inflation_ratio_committee_vs_reward_fund'==$prop){
-				$new_value=round($chain_props['inflation_ratio_committee_vs_reward_fund']/100);
+				$new_value=round($chain_props['inflation_ratio_committee_vs_reward_fund']/100,2);
 			}
 			if('witness_miss_penalty_duration'==$prop){
 				$new_value=($chain_props['witness_miss_penalty_duration']/3600/24);
