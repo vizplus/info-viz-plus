@@ -45,6 +45,7 @@ $work=true;
 $start_time=microtime(true);
 $linked_ops=0;
 $info_time=time();
+$ignored_accounts=[949,948];//spam from bbb,ooo
 $op_types_arr=array(
 	//Аккаунты
 	'5',//account_create
@@ -69,6 +70,7 @@ $op_types_arr=array(
 	'24',//create_invite
 	'26',//invite_registration
 	'30',//claim_invite_balance
+	'56',//use_invite_balance
 	//'49',//escrow_transfer
 	//'54',//escrow_release
 
@@ -102,12 +104,23 @@ while($work){
 	$op_q=$db->sql("SELECT `id`,`type`,`initiator`,`target` FROM `ops` WHERE `linked`=0 AND `counted`!=0 LIMIT 20");// ORDER BY `id` ASC
 	while($op_arr=$db->row($op_q)){
 		if(in_array($op_arr['type'],$op_types_arr)){
-			if(null!=$op_arr['initiator']){
-				$db->sql("INSERT INTO `ops_link` (`account`,`op`) VALUES ('".$op_arr['initiator']."',".$op_arr['id'].")");
-			}
-			if(null!=$op_arr['target']){
-				if($op_arr['initiator']!=$op_arr['target']){
-					$db->sql("INSERT INTO `ops_link` (`account`,`op`) VALUES ('".$op_arr['target']."',".$op_arr['id'].")");
+			$ignore=false;
+			//if(46==$op_arr['type']){
+				if(in_array($op_arr['initiator'],$ignored_accounts)){
+					$ignore=true;
+				}
+				if(in_array($op_arr['target'],$ignored_accounts)){
+					$ignore=true;
+				}
+			//}
+			if(!$ignore){
+				if(null!=$op_arr['initiator']){
+					$db->sql("INSERT INTO `ops_link` (`account`,`op`) VALUES ('".$op_arr['initiator']."',".$op_arr['id'].")");
+				}
+				if(null!=$op_arr['target']){
+					if($op_arr['initiator']!=$op_arr['target']){
+						$db->sql("INSERT INTO `ops_link` (`account`,`op`) VALUES ('".$op_arr['target']."',".$op_arr['id'].")");
+					}
 				}
 			}
 		}
@@ -121,7 +134,7 @@ while($work){
 	if(!file_exists($pid_file)){
 		$work=false;
 	}
-	usleep(100);
+	usleep(1000);
 }
 print 'INFO: PID file was deleted, self-terminating...'.PHP_EOL;
 exit;
