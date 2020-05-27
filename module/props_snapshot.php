@@ -104,7 +104,15 @@ while($work){
 					`inflation_recalc_period`,
 					`data_operations_cost_additional_bandwidth`,
 					`witness_miss_penalty_percent`,
-					`witness_miss_penalty_duration`
+					`witness_miss_penalty_duration`,
+
+					`create_invite_min_balance`,
+					`committee_create_request_fee`,
+					`create_paid_subscription_fee`,
+					`account_on_sale_fee`,
+					`subaccount_on_sale_fee`,
+					`witness_declaration_fee`,
+					`withdraw_intervals`
 					)
 					VALUES (
 					'".(int)$dgp_time."',
@@ -131,7 +139,15 @@ while($work){
 					'".(int)$schedule['median_props']['inflation_recalc_period']."',
 					'".(int)$schedule['median_props']['data_operations_cost_additional_bandwidth']."',
 					'".(int)$schedule['median_props']['witness_miss_penalty_percent']."',
-					'".(int)$schedule['median_props']['witness_miss_penalty_duration']."'
+					'".(int)$schedule['median_props']['witness_miss_penalty_duration']."',
+
+					'".(int)(floatval($schedule['median_props']['create_invite_min_balance'])*1000)."',
+					'".(int)(floatval($schedule['median_props']['committee_create_request_fee'])*1000)."',
+					'".(int)(floatval($schedule['median_props']['create_paid_subscription_fee'])*1000)."',
+					'".(int)(floatval($schedule['median_props']['account_on_sale_fee'])*1000)."',
+					'".(int)(floatval($schedule['median_props']['subaccount_on_sale_fee'])*1000)."',
+					'".(int)(floatval($schedule['median_props']['witness_declaration_fee'])*1000)."',
+					'".(int)$schedule['median_props']['withdraw_intervals']."'
 				)");
 			}
 
