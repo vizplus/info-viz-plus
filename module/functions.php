@@ -521,10 +521,10 @@ function parse_witness($account){
 		}
 	}
 	$witness_id=$db->select_one('witnesses','id',"WHERE `account`='".$account_id."'");
-	if(false!==$witness_id){
+	if(null!==$witness_id){
 		return $witness_id;
 	}
-	$user_arr=$api->execute_method('get_witness_by_account',array($account),false);
+	$user_arr=$api->execute_method('get_witness_by_account',array($account),true);
 	if(isset($user_arr['owner'])){
 		if($user_arr['owner']==$account){
 			$date=date_parse_from_format('Y-m-d\TH:i:s',$user_arr['created']);
@@ -624,13 +624,20 @@ function update_account($id,$account_login){
 	}
 	return false;
 }
+$preparsed_accounts=[];
 function parse_account($account){
-	global $db,$api;
+	global $db,$api,$preparsed_accounts;
 	if(!$account){
 		return 0;
 	}
+	if(isset($preparsed_accounts[$account])){
+		if(null!==$preparsed_accounts[$account]){
+			return $preparsed_accounts[$account];
+		}
+	}
 	$account_id=$db->select_one('accounts','id',"WHERE `name`='".$db->prepare($account)."'");
 	if(null!==$account_id){
+		$preparsed_accounts[$account]=$account_id;
 		return $account_id;
 	}
 	$users_arr=$api->execute_method('get_accounts',array(array($account)),false);
