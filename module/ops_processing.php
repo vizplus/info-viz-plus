@@ -42,6 +42,8 @@ if($pid){
 file_put_contents($pid_file,$new_pid);
 print 'STARTUP: pid file: '.$pid_file.', pid: '.$new_pid.PHP_EOL;
 
+$ignored_accounts=[949,948];//spam from bbb,ooo
+
 $api=new viz_jsonrpc_web($api_arr[array_rand($api_arr)]);
 $work=true;
 $start_time=microtime(true);
@@ -68,7 +70,7 @@ while($work){
 			$witness_id=parse_witness($op_json['owner']);
 
 			$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."', `update`=1 WHERE `id`='".$account_id."'");
-
+			$db->sql("UPDATE `witnesses` SET `update`='1' WHERE `id`='".$witness_id."'");
 			$db->sql("UPDATE `ops` SET `initiator`='".$account_id."' WHERE `id`='".$op_arr['id']."'");
 		}
 		elseif(3==$op_arr['type']){//account_witness_vote
@@ -322,8 +324,17 @@ while($work){
 		elseif(46==$op_arr['type']){//set_account_price
 			$account_id=parse_account($op_json['account']);
 			$target_id=parse_account($op_json['account_seller']);
-			$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."' WHERE `id`='".$account_id."'");
-			$db->sql("UPDATE `ops` SET `initiator`='".$account_id."', `target`='".$target_id."' WHERE `id`='".$op_arr['id']."'");
+			$ignore=false;
+			if(in_array($account_id,$ignored_accounts)){
+				$ignore=true;
+			}
+			if(in_array($target_id,$ignored_accounts)){
+				$ignore=true;
+			}
+			if(!$ignore){
+				$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."' WHERE `id`='".$account_id."'");
+				$db->sql("UPDATE `ops` SET `initiator`='".$account_id."', `target`='".$target_id."' WHERE `id`='".$op_arr['id']."'");
+			}
 		}
 		elseif(47==$op_arr['type']){//buy_account
 			$account_id=parse_account($op_json['buyer']);
@@ -439,6 +450,13 @@ while($work){
 			}
 			$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."' WHERE `id`='".$who."'");
 			$db->sql("UPDATE `ops` SET `initiator`='".$who."', `target`='".$target_id."', `memo`='".$agent_id."' WHERE `id`='".$op_arr['id']."'");
+		}
+		elseif(56==$op_arr['type']){//use_invite_balance
+			$account_id=parse_account($op_json['initiator']);
+			$target_id=parse_account($op_json['receiver']);
+			$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."', `update`=1 WHERE `id`='".$account_id."'");
+			$db->sql("UPDATE `accounts` SET `update`=1 WHERE `id`='".$target_id."'");
+			$db->sql("UPDATE `ops` SET `initiator`='".$account_id."', `target`='".$target_id."' WHERE `id`='".$op_arr['id']."'");
 		}
 		else{
 			exit;
