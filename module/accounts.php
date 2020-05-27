@@ -782,6 +782,11 @@ if($lookup_account){
 				$op_type='account_sale';
 				$descr=ltmp($ltmp_arr['ops-history'][$op_type],['account'=>$op_json['account'],'buyer'=>$op_json['buyer'],'tokens'=>short_viz($op_json['price'])]);
 			}
+			else
+			if(56==$m['type']){
+				$op_type='use_invite_balance';
+				$descr=ltmp($ltmp_arr['ops-history'][$op_type],['key'=>$op_json['invite_secret']]);
+			}
 			else{
 				$descr.=$m['json'];
 			}
