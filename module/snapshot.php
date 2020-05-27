@@ -15,6 +15,7 @@ $time=time();
 $from_time=$time - 3600*24;//1 day
 $date=date('d.m.Y');
 
+
 $work_time=microtime(true);
 $accounts_in_snapshot=0;
 $accounts_q=$db->sql("SELECT `id`,`balance`,`shares`,`delegated`,`received`,`effective`,`witnesses_voted_for`,`custom_sequence` FROM `accounts` WHERE (`activity`>'".$from_time."' OR `update_time`>='".$from_time."')");
@@ -51,20 +52,27 @@ print 'Witnesses in snapshot: '.$witnesses_in_snapshot.PHP_EOL;
 print 'Work time for witnesses snapshot: '.((int)(1000*(microtime(true)-$work_time))).'ms'.PHP_EOL;
 
 $time=time();
-$hour_offset=$time-3600;
-$day_offset=$time-86400;
-$day_offset_block=$db->select_one('blocks','id',"WHERE `time`>='".$day_offset."'");
-$week_offset=$time-604800;//7 days
-$month_offset=$time-2592000;//30 days
+$time_expand4=$time+3600*4;//4 hour to fix date joke on 0:0:0 as previous day
+//$day_time=mktime(0,0,0,date('m'),date('d'),date('Y'));//-2 hour
+$day_time=mktime(0,0,0,date('m',$time_expand4),date('d',$time_expand4),date('Y',$time_expand4));//0 GMT
+$day_time=$day_time-7200;//-2 hour??? server lag
 
-$trx_count=$db->table_count('trx',"WHERE `block`>='".$day_offset_block."'");
+$hour_offset=$day_time-3600;
+$day_offset=$day_time-86400;
+$day_offset_block=$db->select_one('blocks','id',"WHERE `time`>='".$day_offset."'");
+$day_offset_block_stop=$db->select_one('blocks','id',"WHERE `time`<='".$day_time."' ORDER BY `id` DESC");
+$week_offset=$day_time-604800;//7 days
+$month_offset=$day_time-2592000;//30 days
+
+$trx_count=$db->table_count('trx',"WHERE `block`>='".$day_offset_block."' AND `block`<='".$day_offset_block_stop."'");
 
 $accounts_30=$db->table_count('accounts',"WHERE `activity`>'".$month_offset."'");
 $accounts_7=$db->table_count('accounts',"WHERE `activity`>'".$week_offset."'");
 $accounts_1=$db->table_count('accounts',"WHERE `activity`>'".$day_offset."'");
 
-$dgp=$db->sql_row("SELECT * FROM `dgp_snapshot` ORDER BY `id` DESC LIMIT 1");
+$dgp=$db->sql_row("SELECT * FROM `dgp_snapshot` WHERE `time`<='".$day_time."' ORDER BY `id` DESC LIMIT 1");
 $capacity=intval(floor($dgp['average_block_size']/$dgp['maximum_block_size']*10000));
 
-$db->sql("INSERT INTO `stats` (`time`,`accounts_1`,`accounts_7`,`accounts_30`,`trx_count`,`capacity`) VALUES ('".$time."','".$accounts_1."','".$accounts_7."','".$accounts_30."','".$trx_count."','".$capacity."')");
+$db->sql("INSERT INTO `stats` (`time`,`accounts_1`,`accounts_7`,`accounts_30`,`trx_count`,`capacity`) VALUES ('".$day_time."','".$accounts_1."','".$accounts_7."','".$accounts_30."','".$trx_count."','".$capacity."')");
+
 exit;
