@@ -13,6 +13,7 @@ $ltmp_arr=array(
 		'account_create_delegation'=>', делегировано <span class="view-tokens">%shares%</span>',
 		'create_invite'=>'Выписан чек на <span class="view-tokens">%tokens%</span> с кодом проверки <span class="view-key">%key%</span>',
 		'claim_invite_balance'=>'Погашен чек с кодом <span class="view-key">%key%</span>',
+		'use_invite_balance'=>'Погашен чек с кодом <span class="view-key">%key%</span>',
 		'transfer_from'=>'<span class="view-tokens">%tokens%</span> отправлено <a class="view-account" href="/accounts/%to%/">%to%</a>',
 		'transfer_to'=>'<span class="view-tokens">%tokens%</span> получено от <a class="view-account" href="/accounts/%from%/">%from%</a>',
 		'transfer_memo'=>' с заметкой ',
