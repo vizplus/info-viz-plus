@@ -39,25 +39,29 @@ if($lookup_witness){
 					print '<br><h3 class="left">Голосуемые параметры</h3>';
 					$props=json_decode($witness['props'],true);
 					print '
+					<p>Максимальный размер блока: <span class="captions">'.$props['maximum_block_size'].' байт</span></p>
 					<p>Стоимость создания аккаунта: <span class="captions">'.number_format($props['account_creation_fee'],2,'.',' ').' viz</span></p>
 					<p>Стоимость создания аккаунта делегированием: <span class="captions">'.number_format(floatval($props['account_creation_fee'])*intval($props['create_account_delegation_ratio']),2,'.',' ').' viz</span></p>
 					<p>Срок делегирования при создании аккаунта: <span class="captions">'.(round($props['create_account_delegation_time']/86400,2)).' суток</span></p>
 					<hr>
-					<p>Резерв пропускной способности для микроаккаунтов: <span class="captions">'.$props['bandwidth_reserve_percent'].'%</span></p>
-					<p>Максимальный капитал микроаккаунта: <span class="captions">'.number_format($props['bandwidth_reserve_below'],2,'.',' ').' viz</span></p>
+					<p>Минимальное количество токенов при делегировании: <span class="captions">'.number_format($props['min_delegation'],2,'.',' ').' viz</span></p>
+					<p>Минимальная сумма чека: <span class="captions">'.number_format($props['create_invite_min_balance'],2,'.',' ').' viz</span>
 					<hr>
+					<p>Резерв пропускной способности для микроаккаунтов: <span class="captions">'.round($props['bandwidth_reserve_percent']/100,2).'%</span></p>
+					<p>Максимальный капитал микроаккаунта: <span class="captions">'.number_format($props['bandwidth_reserve_below'],2,'.',' ').' viz</span></p>
+					<p>Минимальный размер награждающего капитала: <span class="captions">'.number_format($props['vote_accounting_min_rshares']/1000000,2,'.',' ').' viz</span></p>
+					<p>Количество периодов (дней) уменьшения капитала: <span class="captions">'.$props['withdraw_intervals'].'</span>
+					<p>Минимальная доля совокупного социального капитала для решения по заявке в Фонде ДАО: <span class="captions">'.round($props['committee_request_approve_min_percent']/100,2).'%</span></p>
 					<p>Дополнительная наценка пропускной способности за каждую data операцию в транзакции: <span class="captions">'.round($props['data_operations_cost_additional_bandwidth']/100,2).'%</span></p>
 					<hr>
-					<p>Минимальное количество токенов при делегировании: <span class="captions">'.number_format($props['min_delegation'],2,'.',' ').' viz</span></p>
-					<hr>
-					<p>Минимальный размер награждающего капитала: <span class="captions">'.number_format($props['vote_accounting_min_rshares']/1000000,2,'.',' ').' viz</span></p>
-					<hr>
-					<p>Максимальный размер блока: <span class="captions">'.$props['maximum_block_size'].' байт</span></p>
-					<hr>
-					<p>Минимальная доля совокупного социального капитала для решения по заявке в Фонде ДАО: <span class="captions">'.round($props['committee_request_approve_min_percent']/100,2).'%</span></p>
-					<hr>
 					<p>Штраф делегату за пропуск блока (% от суммарного веса голосов за делегата): <span class="captions">'.round($props['witness_miss_penalty_percent']/100,2).'%</span></p>
-					<p>Продолжительность штрафа делегату за пропуск блока: <span class="captions">'.(round($props['witness_miss_penalty_duration']/86400,2)).' суток</span>
+					<p>Продолжительность штрафа делегату за пропуск блока: <span class="captions">'.(round($props['witness_miss_penalty_duration']/86400,2)).' сут.</span>
+					<hr>
+					<p>Плата за создание заявки в Фонд ДАО: <span class="captions">'.number_format($props['committee_create_request_fee'],2,'.',' ').' viz</span>
+					<p>Плата за создание платной подписки: <span class="captions">'.number_format($props['create_paid_subscription_fee'],2,'.',' ').' viz</span>
+					<p>Плата за выставление аккаунта на продажу: <span class="captions">'.number_format($props['account_on_sale_fee'],2,'.',' ').' viz</span>
+					<p>Плата за выставление субаккаунтов на продажу: <span class="captions">'.number_format($props['subaccount_on_sale_fee'],2,'.',' ').' viz</span>
+					<p>Плата за объявление аккаунта делегатом: <span class="captions">'.number_format($props['witness_declaration_fee'],2,'.',' ').' viz</span>
 					</p>';
 					print '<hr>
 					<p><strong>Распределение эмиссии</strong></p>
@@ -108,6 +112,14 @@ else{
 			<option value="witness_miss_penalty_percent">Параметр: witness_miss_penalty_percent</option>
 			<option value="witness_miss_penalty_duration">Параметр: witness_miss_penalty_duration</option>
 
+			<option value="create_invite_min_balance">Параметр: create_invite_min_balance</option>
+			<option value="committee_create_request_fee">Параметр: committee_create_request_fee</option>
+			<option value="create_paid_subscription_fee">Параметр: create_paid_subscription_fee</option>
+			<option value="account_on_sale_fee">Параметр: account_on_sale_fee</option>
+			<option value="subaccount_on_sale_fee">Параметр: subaccount_on_sale_fee</option>
+			<option value="witness_declaration_fee">Параметр: witness_declaration_fee</option>
+			<option value="withdraw_intervals">Параметр: withdraw_intervals</option>
+
 		</select>
 	</p>';
 	print '<table class="witnesses captions sortable-theme-slick" width="100%" data-sortable>';
@@ -142,6 +154,14 @@ else{
 		<th title="data_operations_cost_additional_bandwidth" data-field="data_operations_cost_additional_bandwidth" class="from-selector hidden">Параметр</th>
 		<th title="witness_miss_penalty_percent" data-field="witness_miss_penalty_percent" class="from-selector hidden">Параметр</th>
 		<th title="witness_miss_penalty_duration" data-field="witness_miss_penalty_duration" class="from-selector hidden">Параметр</th>
+
+		<th title="create_invite_min_balance" data-field="create_invite_min_balance" class="from-selector hidden">Параметр</th>
+		<th title="committee_create_request_fee" data-field="committee_create_request_fee" class="from-selector hidden">Параметр</th>
+		<th title="create_paid_subscription_fee" data-field="create_paid_subscription_fee" class="from-selector hidden">Параметр</th>
+		<th title="account_on_sale_fee" data-field="account_on_sale_fee" class="from-selector hidden">Параметр</th>
+		<th title="subaccount_on_sale_fee" data-field="subaccount_on_sale_fee" class="from-selector hidden">Параметр</th>
+		<th title="witness_declaration_fee" data-field="witness_declaration_fee" class="from-selector hidden">Параметр</th>
+		<th title="withdraw_intervals" data-field="withdraw_intervals" class="from-selector hidden">Параметр</th>
 	</tr>';
 	print '</thead>';
 	print '<tbody>';
@@ -187,6 +207,14 @@ else{
 			<td data-field="data_operations_cost_additional_bandwidth" data-value="'.$props['data_operations_cost_additional_bandwidth'].'" class="from-selector hidden">'.round($props['data_operations_cost_additional_bandwidth']/100,2).'%</td>
 			<td data-field="witness_miss_penalty_percent" class="from-selector hidden">'.round($props['witness_miss_penalty_percent']/100,2).'%</td>
 			<td data-field="witness_miss_penalty_duration" class="from-selector hidden">'.$props['witness_miss_penalty_duration'].'</td>
+
+			<td data-field="create_invite_min_balance" data-value="'.intval(1000*floatval($props['create_invite_min_balance'])).'" class="from-selector hidden">'.number_format(floatval($props['create_invite_min_balance']),2,'.',' ').' viz</td>
+			<td data-field="committee_create_request_fee" data-value="'.intval(1000*floatval($props['committee_create_request_fee'])).'" class="from-selector hidden">'.number_format(floatval($props['committee_create_request_fee']),2,'.',' ').' viz</td>
+			<td data-field="create_paid_subscription_fee" data-value="'.intval(1000*floatval($props['create_paid_subscription_fee'])).'" class="from-selector hidden">'.number_format(floatval($props['create_paid_subscription_fee']),2,'.',' ').' viz</td>
+			<td data-field="account_on_sale_fee" data-value="'.intval(1000*floatval($props['account_on_sale_fee'])).'" class="from-selector hidden">'.number_format(floatval($props['account_on_sale_fee']),2,'.',' ').' viz</td>
+			<td data-field="subaccount_on_sale_fee" data-value="'.intval(1000*floatval($props['subaccount_on_sale_fee'])).'" class="from-selector hidden">'.number_format(floatval($props['subaccount_on_sale_fee']),2,'.',' ').' viz</td>
+			<td data-field="witness_declaration_fee" data-value="'.intval(1000*floatval($props['witness_declaration_fee'])).'" class="from-selector hidden">'.number_format(floatval($props['witness_declaration_fee']),2,'.',' ').' viz</td>
+			<td data-field="withdraw_intervals" class="from-selector hidden">'.$props['withdraw_intervals'].'</td>
 		</tr>';
 		if($active){
 			$num++;
