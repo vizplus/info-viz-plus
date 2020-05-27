@@ -96,6 +96,9 @@ if('tx'==$path_array[2]){
 				print $ops;
 				print '</tbody></table>';
 			}
+			else{
+				print '<p>В транзакции присутствует '.$trx_arr['ops'].' операций связанных с спамом.</p>';
+			}
 		}
 	}
 	else{
