@@ -53,6 +53,64 @@ else{
 }
 print 'STARTUP: Start from block #'.$block_id.', working with endpoint: '.$api->endpoint.'...'.PHP_EOL;
 
+////////////////////////////////////////////// + IGNORE SYSTEM
+$ignore_list=file($site_root.'/ignore_list.txt',FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
+print 'Ignore list loaded: '.count($ignore_list).' accounts'.PHP_EOL;
+$find_json_initiator_by_type=[
+	1=>'witness',
+	2=>'owner',
+	3=>'account',
+	4=>'account',
+	5=>'creator',
+	6=>'owner',
+	7=>'from',
+	8=>'delegator',
+	9=>'author',
+	10=>'voter',
+	11=>'owner',
+	12=>'account',
+	13=>'CUSTOM',//required_active_auths,required_regular_auths
+	14=>'creator',
+	15=>'curator',
+	16=>'author',
+	17=>'author',
+	18=>'author',
+	19=>'from_account',
+	20=>'benefactor',
+	21=>'from',
+	22=>'voter',
+	23=>'creator',
+	24=>'creator',
+	26=>'initiator',
+	28=>'account',
+	29=>'from_account',
+	30=>'initiator',
+	31=>'account',
+	33=>'worker',
+	35=>'author',
+	36=>'account',
+	37=>'initiator',
+	38=>'initiator',
+	39=>'owner',
+	40=>'initiator',
+	41=>'account',
+	42=>'subscriber',
+	43=>'subscriber',
+	44=>'subscriber',
+	45=>'account',
+	46=>'account',
+	47=>'buyer',
+	48=>'buyer',
+	49=>'from',
+	50=>'account_to_recover',
+	51=>'author',
+	52=>'author',
+	53=>'who',
+	54=>'who',
+	55=>'who',
+];
+////////////////////////////////////////////// - IGNORE SYSTEM
+
 $work=true;
 $work_time=time();
 $current_block=$block_id;
@@ -141,11 +199,45 @@ while($work){
 						$trx_id=$db->last_id();
 
 						foreach($trx_hash_ops_data[$hash] as $data){
-							$db->sql("INSERT INTO `ops` (`type`,`block`,`trx`,`v`,`json`,`time`) VALUES ('".$data['type']."','".$current_block."','".$trx_id."','".($data['v']?'1':'0')."','".$db->prepare($data['json'])."','".$data['time']."')");
+							////////////////////////////////////////////////////// IGNORE SYSTEM TO PREVENT SPAM
+							$ignore=false;
+							if(isset($find_json_initiator_by_type[$data['type']])){
+								$json_check=json_decode($data['json'],true);
+								if('CUSTOM'==$find_json_initiator_by_type[$data['type']]){
+									foreach($json_check['required_active_auths'] as $check_ignore){
+										if(in_array($check_ignore,$ignore_list)){
+											$ignore=true;
+										}
+									}
+									foreach($json_check['required_regular_auths'] as $check_ignore){
+										if(in_array($check_ignore,$ignore_list)){
+											$ignore=true;
+										}
+									}
+								}
+								else{
+									if(in_array($json_check[$find_json_initiator_by_type[$data['type']]],$ignore_list)){
+										$ignore=true;
+									}
+								}
+							}
+							/*
+							$ignore=false;
+							if(isset($ignored_ops[$data['type']])){
+								if(isset($ignored_ops[$data['type']][$data['json']])){
+									$ignore=true;
+								}
+							}
+							*/
+							////////////////////////////////////////////////////// IGNORE SYSTEM TO PREVENT SPAM
+							if(!$ignore){
+								$db->sql("INSERT INTO `ops` (`type`,`block`,`trx`,`v`,`json`,`time`) VALUES ('".$data['type']."','".$current_block."','".$trx_id."','".($data['v']?'1':'0')."','".$db->prepare($data['json'])."','".$data['time']."')");
+							}
 						}
 						$trx_num++;
 					}
 					else{
+						if(isset($trx_hash_ops_data[$hash]))
 						foreach($trx_hash_ops_data[$hash] as $data){
 							$db->sql("INSERT INTO `ops` (`type`,`block`,`v`,`json`,`time`) VALUES ('".$data['type']."','".$current_block."','".($data['v']?'1':'0')."','".$db->prepare($data['json'])."','".$data['time']."')");
 						}
