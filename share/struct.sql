@@ -130,6 +130,13 @@ CREATE TABLE `chain_props_snapshot` (
   `data_operations_cost_additional_bandwidth` int(11) NOT NULL,
   `witness_miss_penalty_percent` int(11) NOT NULL,
   `witness_miss_penalty_duration` int(11) NOT NULL,
+  `create_invite_min_balance` int(11) DEFAULT NULL,
+  `committee_create_request_fee` int(11) DEFAULT NULL,
+  `create_paid_subscription_fee` int(11) DEFAULT NULL,
+  `account_on_sale_fee` int(11) DEFAULT NULL,
+  `subaccount_on_sale_fee` int(11) DEFAULT NULL,
+  `witness_declaration_fee` int(11) DEFAULT NULL,
+  `withdraw_intervals` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `time` (`time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
