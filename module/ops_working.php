@@ -250,7 +250,7 @@ while($work){
 		}
 		$db->sql("UPDATE `ops` SET `worked`=1 WHERE `id`='".$op_arr['id']."'");
 		$worked_ops++;
-		usleep(1000);
+		usleep(100000);
 	}
 	if(time()>(5+$info_time)){
 		print 'Worked ops '.$worked_ops.' ('.$current_work_time.'ms execute time, avg '.round(100*$current_work_time/$worked_ops,2).'ms per 100 ops)'.PHP_EOL;
