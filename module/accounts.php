@@ -19,14 +19,43 @@ if($lookup_account){
 		$json=json_decode($account_arr['json'],true);
 		print '<div class="public-profile clearfix">';
 		$json['profile']['avatar_image']=$json['profile']['avatar'];
+		function safe_avatar($avatar){
+			$result='';
+			$error=false;
+			if(0===strpos($avatar,'https://')){
+				$result=$avatar;
+			}
+			elseif(0===strpos($avatar,'ipfs://')){
+				$result='https://cloudflare-ipfs.com/ipfs/'.substr($avatar,7);
+			}
+			elseif(0===strpos($avatar,'sia://')){
+				$result='https://siasky.net/'.substr($avatar,6);
+			}
+			elseif(0===strpos($avatar,'http://')){
+				$result='https://i.goldvoice.club/128x128/'.$avatar;
+			}
+			elseif(0===strpos($avatar,'data:')){
+				$error=true;//no encoded
+			}
+			else{
+				$error=true;//unknown
+			}
+			if($error){
+				$result='/default-avatar.png';
+			}
+			return htmlspecialchars($result);
+		}
 		if(!isset($json['profile']['avatar'])){
 			$json['profile']['avatar']='/default-avatar.png';
 			$json['profile']['avatar_image']='/default-avatar.png';
 		}
 		else{
-			if(false===strpos($json['profile']['avatar_image'],'https://')){
-				$json['profile']['avatar_image']='https://i.goldvoice.club/128x128/'.$json['profile']['avatar_image'];
-			}
+			$json['profile']['avatar_image']=safe_avatar($json['profile']['avatar_image']);
+			$replace['head_addon'].='
+			<link rel="image_src" href="'.$json['profile']['avatar_image'].'"/>
+			<meta property="og:image" content="'.$json['profile']['avatar_image'].'"/>
+			<meta name="twitter:image" content="'.$json['profile']['avatar_image'].'"/>
+			<meta name="twitter:card" content="summary_large_image"/>';
 		}
 		print '<a href="'.htmlspecialchars($json['profile']['avatar']).'" target="_blank" rel="nofollow" title="Аватар"><img src="'.htmlspecialchars($json['profile']['avatar_image']).'" class="avatar"></a>';
 
@@ -35,6 +64,7 @@ if($lookup_account){
 			$json['profile']['nickname']='@'.$lookup_account;
 		}
 		print '<h3 class="left" title="Псевдоним">'.htmlspecialchars($json['profile']['nickname']).'</h3>';
+		$replace['description']='Карточка аккаунта @'.htmlspecialchars($lookup_account).' в блокчейне VIZ: история операций, социальный капитал, делегирование, публичные ключи, голоса за делегатов.';
 		if(!isset($json['profile']['about'])){
 			$json['profile']['about']='Отсутствует описание аккаунта';
 		}
@@ -49,7 +79,11 @@ if($lookup_account){
 			print '<p class="grey small captions"><img src="/mail.svg" class="icon-16" alt="Электронная почта" title="Электронная почта"><a target="_blank" href="mailto:'.htmlspecialchars($json['profile']['mail']).'">'.htmlspecialchars($json['profile']['mail']).'</a></p>';
 		}
 		if(isset($json['profile']['interests'])){
-			print '<p class="grey small captions">Интересы: '.htmlspecialchars(implode(', ',$json['profile']['interests'])).'</p>';
+			if(is_array($json['profile']['interests'])){
+				if($json['profile']['interests'][0]){
+					print '<p class="grey small captions">Интересы: '.htmlspecialchars(implode(', ',$json['profile']['interests'])).'</p>';
+				}
+			}
 		}
 		if(isset($json['profile']['services'])){
 			print '<p class="grey small captions">Контакты: ';
@@ -128,7 +162,7 @@ if($lookup_account){
 		$auths_arr=array('1'=>'Мастер доступ','2'=>'Активный доступ','3'=>'Регулярный доступ');
 		$q=$db->sql("SELECT * FROM `accounts_authority` WHERE `account`='".$account_arr['id']."' ORDER BY `type` ASC");
 		while($m=$db->row($q)){
-			$auths_info.='<p>'.$auths_arr[$m['type']].': <a class="view-account captions" href="/accounts/'.get_account_name($m['agent']).'/">'.get_account_name($m['agent']).'</a></p>';
+			$auths_info.='<p>'.$auths_arr[$m['type']].': <a class="view-account captions" href="/accounts/'.get_account_name($m['agent']).'/">'.get_account_name($m['agent']).'</a>, вес '.round($m['weight']/$m['weight_threshold']*100,2).'%</p>';
 		}
 		if($auths_info){
 			print '<hr>';

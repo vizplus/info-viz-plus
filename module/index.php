@@ -510,7 +510,7 @@ if(''==$path_array[1]){
 			';
 
 	$charts_arr=[];
-	$q=$db->sql("SELECT * FROM `stats` ORDER BY `id` DESC LIMIT 1000");
+	$q=$db->sql("SELECT * FROM `stats` WHERE `time` >= 1592611200 ORDER BY `id` DESC LIMIT 1000");
 	while($m=$db->row($q)){
 		$charts_arr['accounts_1'][]=[($m['time'])*1000,(int)$m['accounts_1']];
 		$charts_arr['accounts_7'][]=[($m['time'])*1000,(int)$m['accounts_7']];
@@ -1011,7 +1011,7 @@ if(''==$path_array[1]){
 	<td class="nowrap"><a href="/props/maximum_block_size/">'.$chain_props['maximum_block_size'].' байт</a></td></tr>';
 
 	print '<tr><td>Дополнительная наценка пропускной способности за каждую data операцию в транзакции</td>
-	<td><a href="/props/data_operations_cost_additional_bandwidth/">'.round($chain_props['data_operations_cost_additional_bandwidth']/10000).'%</a></td></tr>';
+	<td><a href="/props/data_operations_cost_additional_bandwidth/">'.round($chain_props['data_operations_cost_additional_bandwidth']/100,2).'%</a></td></tr>';
 	print '<tr><td>Минимальное количество токенов при делегировании</td>
 	<td><a href="/props/min_delegation/">'.short_viz($chain_props['min_delegation']/1000,true).'</a></td></tr>';
 	print '<tr><td>Минимальный размер награждающего капитала</td>

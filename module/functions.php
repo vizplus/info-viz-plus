@@ -597,10 +597,10 @@ function update_account($id,$account_login){
 					$db->sql("INSERT INTO `accounts_keys` (`account`,`type`,`key`,`weight`,`weight_threshold`) VALUES ('".(int)$user_arr['id']."','1','".$key[0]."','".$key[1]."','".$user_arr['master_authority']['weight_threshold']."')");
 				}
 				foreach($user_arr['active_authority']['key_auths'] as $key){
-					$db->sql("INSERT INTO `accounts_keys` (`account`,`type`,`key`,`weight`,`weight_threshold`) VALUES ('".(int)$user_arr['id']."','2','".$key[0]."','".$key[1]."','".$user_arr['master_authority']['weight_threshold']."')");
+					$db->sql("INSERT INTO `accounts_keys` (`account`,`type`,`key`,`weight`,`weight_threshold`) VALUES ('".(int)$user_arr['id']."','2','".$key[0]."','".$key[1]."','".$user_arr['active_authority']['weight_threshold']."')");
 				}
 				foreach($user_arr['regular_authority']['key_auths'] as $key){
-					$db->sql("INSERT INTO `accounts_keys` (`account`,`type`,`key`,`weight`,`weight_threshold`) VALUES ('".(int)$user_arr['id']."','3','".$key[0]."','".$key[1]."','".$user_arr['master_authority']['weight_threshold']."')");
+					$db->sql("INSERT INTO `accounts_keys` (`account`,`type`,`key`,`weight`,`weight_threshold`) VALUES ('".(int)$user_arr['id']."','3','".$key[0]."','".$key[1]."','".$user_arr['regular_authority']['weight_threshold']."')");
 				}
 				$db->sql("INSERT INTO `accounts_keys` (`account`,`type`,`key`,`weight`,`weight_threshold`) VALUES ('".(int)$user_arr['id']."','4','".$user_arr['memo_key']."',0,0)");
 
@@ -611,11 +611,11 @@ function update_account($id,$account_login){
 				}
 				foreach($user_arr['active_authority']['account_auths'] as $agent){
 					$agent_id=parse_account($agent[0]);
-					$db->sql("INSERT INTO `accounts_authority` (`account`,`type`,`agent`,`weight`,`weight_threshold`) VALUES ('".(int)$user_arr['id']."','2','".$agent_id."','".$agent[1]."','".$user_arr['master_authority']['weight_threshold']."')");
+					$db->sql("INSERT INTO `accounts_authority` (`account`,`type`,`agent`,`weight`,`weight_threshold`) VALUES ('".(int)$user_arr['id']."','2','".$agent_id."','".$agent[1]."','".$user_arr['active_authority']['weight_threshold']."')");
 				}
 				foreach($user_arr['regular_authority']['account_auths'] as $agent){
 					$agent_id=parse_account($agent[0]);
-					$db->sql("INSERT INTO `accounts_authority` (`account`,`type`,`agent`,`weight`,`weight_threshold`) VALUES ('".(int)$user_arr['id']."','3','".$agent_id."','".$agent[1]."','".$user_arr['master_authority']['weight_threshold']."')");
+					$db->sql("INSERT INTO `accounts_authority` (`account`,`type`,`agent`,`weight`,`weight_threshold`) VALUES ('".(int)$user_arr['id']."','3','".$agent_id."','".$agent[1]."','".$user_arr['regular_authority']['weight_threshold']."')");
 				}
 
 				return true;

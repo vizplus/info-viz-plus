@@ -20,8 +20,10 @@ $work_time=microtime(true);
 $accounts_in_snapshot=0;
 $accounts_q=$db->sql("SELECT `id`,`balance`,`shares`,`delegated`,`received`,`effective`,`witnesses_voted_for`,`custom_sequence` FROM `accounts` WHERE (`activity`>'".$from_time."' OR `update_time`>='".$from_time."')");
 while($account=$db->row($accounts_q)){
-	$initiator_ops_count=$db->table_count('ops',"WHERE `time`>='".$from_time."' AND `initiator`='".$account['id']."' AND `v`=0");
-	$target_ops_count=$db->table_count('ops',"WHERE `time`>='".$from_time."' AND `target`='".$account['id']."'");
+	$initiator_ops_count=0;
+	$target_ops_count=0;
+	//$initiator_ops_count=$db->table_count('ops',"WHERE `time`>='".$from_time."' AND `initiator`='".$account['id']."' AND `v`=0");
+	//$target_ops_count=$db->table_count('ops',"WHERE `time`>='".$from_time."' AND `target`='".$account['id']."'");
 	$db->sql("INSERT INTO `accounts_snapshot` (`date`,`time`,`account`,`balance`,`shares`,`delegated`,`received`,`effective`,`witnesses_voted_for`,`custom_sequence`,`initiator_ops_count`,`target_ops_count`) VALUES ('".$db->prepare($date)."','".$time."','".$account['id']."','".$db->prepare($account['balance'])."','".$db->prepare($account['shares'])."','".$db->prepare($account['delegated'])."','".$db->prepare($account['received'])."','".$db->prepare($account['effective'])."','".$db->prepare($account['witnesses_voted_for'])."','".$db->prepare($account['custom_sequence'])."','".$initiator_ops_count."','".$target_ops_count."')");
 	$accounts_in_snapshot++;
 }
@@ -51,6 +53,7 @@ while($witness=$db->row($witnesses_q)){
 print 'Witnesses in snapshot: '.$witnesses_in_snapshot.PHP_EOL;
 print 'Work time for witnesses snapshot: '.((int)(1000*(microtime(true)-$work_time))).'ms'.PHP_EOL;
 
+$work_time=microtime(true);
 $time=time();
 $time_expand4=$time+3600*4;//4 hour to fix date joke on 0:0:0 as previous day
 //$day_time=mktime(0,0,0,date('m'),date('d'),date('Y'));//-2 hour
@@ -71,8 +74,10 @@ $accounts_7=$db->table_count('accounts',"WHERE `activity`>'".$week_offset."'");
 $accounts_1=$db->table_count('accounts',"WHERE `activity`>'".$day_offset."'");
 
 $dgp=$db->sql_row("SELECT * FROM `dgp_snapshot` WHERE `time`<='".$day_time."' ORDER BY `id` DESC LIMIT 1");
+print_r($dgp);
 $capacity=intval(floor($dgp['average_block_size']/$dgp['maximum_block_size']*10000));
 
 $db->sql("INSERT INTO `stats` (`time`,`accounts_1`,`accounts_7`,`accounts_30`,`trx_count`,`capacity`) VALUES ('".$day_time."','".$accounts_1."','".$accounts_7."','".$accounts_30."','".$trx_count."','".$capacity."')");
 
+print 'Work time for stats snapshot: '.((int)(1000*(microtime(true)-$work_time))).'ms'.PHP_EOL;
 exit;

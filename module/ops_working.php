@@ -57,6 +57,7 @@ $op_types_arr=[
 		'53',//escrow_approve
 		'54',//escrow_release
 		'55',//escrow_dispute
+		'57',//expire_escrow_ratification
 	],
 ];
 $work_ops_types=[];
@@ -174,6 +175,24 @@ while($work){
 							$db->sql("UPDATE `escrow` SET `dispute_by`='".$who."', `dispute`=1 WHERE `id`='".$escrow_arr['id']."'");
 						}
 					}
+					if(57==$op_arr['type']){//expire_escrow_ratification
+						$db->sql("UPDATE `escrow` SET `active`=0, `amount`=0, `fee`=0, `expired`=1 WHERE `approved`=0 AND `ratification_deadline`<".$op_arr['time']);
+						$db->sql("UPDATE `escrow` SET `expired`=1 WHERE `approved`=1 AND `expiration`<".$op_arr['time']);
+
+						$escrow_id=$op_json['escrow_id'];
+						$from=parse_account($op_json['from']);
+						$to=parse_account($op_json['to']);
+						$agent=parse_account($op_json['agent']);
+						$receiver=parse_account($op_json['receiver']);
+						$token_amount=(int)(floatval($op_json['token_amount'])*1000);
+						$fee=(int)(floatval($op_json['fee'])*1000);
+						$date=date_parse_from_format('Y-m-d\TH:i:s',$op_json['ratification_deadline']);
+						$ratification_deadline=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
+						$escrow_arr=$db->sql_row("SELECT * FROM `escrow` WHERE `active`=1 AND `escrow_id`='".$escrow_id."' AND `from`='".$from."'");
+						if($escrow_arr['id']){
+							$db->sql("UPDATE `escrow` SET `amount`=`amount`-'".$token_amount."', `expired`=1, `active`=0 WHERE `id`='".$escrow_arr['id']."'");
+						}
+					}
 				}
 			}
 			if('delegations'==$work_type){
@@ -205,12 +224,12 @@ while($work){
 						$existed=$db->sql_row("SELECT * FROM `delegations` WHERE `from`='".$from."' AND `to`='".$to."'");
 						if($existed['id']){
 							$shares_diff=$shares-$existed['shares'];
-							if($shares_diff>0){
+							if($shares_diff>=0){
 								//positive, update changes
 								$db->sql("UPDATE `delegations` SET `shares`='".$shares."', `time`='".$op_arr['time']."' WHERE `from`='".$from."' AND `to`='".$to."'");
 							}
 							else{
-								if(0==$shares_diff){//just return all
+								if(0==$shares_diff){//can't be there, because diff = 0, same amount
 									//return exist?
 									$existed_return=$db->sql_row("SELECT * FROM `delegations` WHERE `from`='".$from."' AND `to`='".$from."'");
 									if($existed_return['id']){//add shares amount

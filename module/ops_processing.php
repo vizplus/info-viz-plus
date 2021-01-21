@@ -69,7 +69,7 @@ while($work){
 			$account_id=parse_account($op_json['owner']);
 			$witness_id=parse_witness($op_json['owner']);
 
-			$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."', `update`=1 WHERE `id`='".$account_id."'");
+			$db->sql("UPDATE `accounts` SET `update`=1, `activity`='".$op_arr['time']."' WHERE `id`='".$account_id."'");
 			$db->sql("UPDATE `witnesses` SET `update`='1' WHERE `id`='".$witness_id."'");
 			$db->sql("UPDATE `ops` SET `initiator`='".$account_id."' WHERE `id`='".$op_arr['id']."'");
 		}
@@ -105,6 +105,11 @@ while($work){
 			$account_id=parse_account($op_json['from']);
 			$target_id=parse_account($op_json['to']);
 			$memo=$db->prepare($op_json['memo']);
+			if('anonymous'==$op_json['to']){
+				if(false!==strpos($memo,':')){
+					$new_account=parse_account(substr($memo,0,strpos($memo,':')));
+				}
+			}
 			$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."', `update`=1 WHERE `id`='".$account_id."'");
 			$db->sql("UPDATE `accounts` SET `update`=1 WHERE `id`='".$target_id."'");
 			$db->sql("UPDATE `ops` SET `initiator`='".$account_id."', `target`='".$target_id."', `memo`='".$memo."' WHERE `id`='".$op_arr['id']."'");
@@ -160,7 +165,7 @@ while($work){
 		elseif(14==$op_arr['type']){//committee_worker_create_request
 			$account_id=parse_account($op_json['creator']);
 			$target_id=parse_account($op_json['worker']);
-			$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."' WHERE `id`='".$account_id."'");
+			$db->sql("UPDATE `accounts` SET `update`=1, `activity`='".$op_arr['time']."' WHERE `id`='".$account_id."'");
 			$db->sql("UPDATE `ops` SET `initiator`='".$account_id."', `target`='".$target_id."' WHERE `id`='".$op_arr['id']."'");
 		}
 		elseif(15==$op_arr['type']){//curation_reward DEPRECATED
@@ -295,7 +300,7 @@ while($work){
 		}
 		elseif(41==$op_arr['type']){//set_paid_subscription
 			$account_id=parse_account($op_json['account']);
-			$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."' WHERE `id`='".$account_id."'");
+			$db->sql("UPDATE `accounts` SET `update`=1, `activity`='".$op_arr['time']."' WHERE `id`='".$account_id."'");
 			$db->sql("UPDATE `ops` SET `initiator`='".$account_id."' WHERE `id`='".$op_arr['id']."'");
 		}
 		elseif(42==$op_arr['type']){//paid_subscribe
@@ -318,7 +323,7 @@ while($work){
 		elseif(45==$op_arr['type']){//set_subaccount_price
 			$account_id=parse_account($op_json['account']);
 			$target_id=parse_account($op_json['subaccount_seller']);
-			$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."' WHERE `id`='".$account_id."'");
+			$db->sql("UPDATE `accounts` SET `update`=1, `activity`='".$op_arr['time']."' WHERE `id`='".$account_id."'");
 			$db->sql("UPDATE `ops` SET `initiator`='".$account_id."', `target`='".$target_id."' WHERE `id`='".$op_arr['id']."'");
 		}
 		elseif(46==$op_arr['type']){//set_account_price
@@ -332,7 +337,7 @@ while($work){
 				$ignore=true;
 			}
 			if(!$ignore){
-				$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."' WHERE `id`='".$account_id."'");
+				$db->sql("UPDATE `accounts` SET `update`=1, `activity`='".$op_arr['time']."' WHERE `id`='".$account_id."'");
 				$db->sql("UPDATE `ops` SET `initiator`='".$account_id."', `target`='".$target_id."' WHERE `id`='".$op_arr['id']."'");
 			}
 		}
@@ -457,6 +462,13 @@ while($work){
 			$db->sql("UPDATE `accounts` SET `activity`='".$op_arr['time']."', `update`=1 WHERE `id`='".$account_id."'");
 			$db->sql("UPDATE `accounts` SET `update`=1 WHERE `id`='".$target_id."'");
 			$db->sql("UPDATE `ops` SET `initiator`='".$account_id."', `target`='".$target_id."' WHERE `id`='".$op_arr['id']."'");
+		}
+		elseif(57==$op_arr['type']){//expire_escrow_ratification
+			$from_id=parse_account($op_json['from']);
+			$to_id=parse_account($op_json['to']);
+			$agent_id=parse_account($op_json['agent']);//second target? going put in memo field
+			$db->sql("UPDATE `accounts` SET `update`=1 WHERE `id`='".$from_id."'");
+			$db->sql("UPDATE `ops` SET `initiator`='".$from_id."', `target`='".$target_id."', `memo`='".$agent_id."' WHERE `id`='".$op_arr['id']."'");
 		}
 		else{
 			exit;

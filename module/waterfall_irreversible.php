@@ -55,6 +55,7 @@ print 'STARTUP: Start from block #'.$block_id.', working with endpoint: '.$api->
 
 ////////////////////////////////////////////// + IGNORE SYSTEM
 $ignore_list=file($site_root.'/ignore_list.txt',FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
+$custom_spam_list=[];
 print 'Ignore list loaded: '.count($ignore_list).' accounts'.PHP_EOL;
 $find_json_initiator_by_type=[
 	1=>'witness',
@@ -132,9 +133,9 @@ while($work){
 			//print 'Trying get_ops_in_block with '.($api->endpoint).' on #'.$current_block.' (used '.(round(memory_get_usage(true)/1024,2).'kb').')'.PHP_EOL;
 			$block_data=$api->execute_method('get_block',array($current_block),false);
 			//print_r($block_data);
-			print 'DEBUG PROCCESS #'.$current_block.' ('.(int)(1000*(microtime(true)-$current_block_time)).'ms execute time) for get_block'.PHP_EOL;
+			//print 'DEBUG PROCCESS #'.$current_block.' ('.(int)(1000*(microtime(true)-$current_block_time)).'ms execute time) for get_block'.PHP_EOL;
 			$ops_data=$api->execute_method('get_ops_in_block',array($current_block,0),false);
-			print 'DEBUG PROCCESS #'.$current_block.' ('.(int)(1000*(microtime(true)-$current_block_time)).'ms execute time) for get_ops_in_block'.PHP_EOL;
+			//print 'DEBUG PROCCESS #'.$current_block.' ('.(int)(1000*(microtime(true)-$current_block_time)).'ms execute time) for get_ops_in_block'.PHP_EOL;
 			//print_r($ops_data);
 
 			if(false!==$block_data){
@@ -149,6 +150,7 @@ while($work){
 				$block_time=mktime($date['hour'],$date['minute'],$date['second'],$date['month'],$date['day'],$date['year']);
 				$prev_hash=$block_data['previous'];
 
+				$custom_spam_list=[];
 				$trx=0;
 				$ops=0;
 				$vops=0;
@@ -204,12 +206,40 @@ while($work){
 							if(isset($find_json_initiator_by_type[$data['type']])){
 								$json_check=json_decode($data['json'],true);
 								if('CUSTOM'==$find_json_initiator_by_type[$data['type']]){
+									print 'check $custom_spam_list < '.$json_check['required_regular_auths'][0].': ';
+									if(isset($custom_spam_list[$json_check['required_regular_auths'][0]])){
+										print $custom_spam_list[$json_check['required_regular_auths'][0]].PHP_EOL;
+									}
+									else{
+										print 'none'.PHP_EOL;
+									}
+									if(isset($json_check['required_regular_auths'][0])){
+										if(isset($custom_spam_list[$json_check['required_regular_auths'][0]])){
+											if($custom_spam_list[$json_check['required_regular_auths'][0]]>10){
+												$ignore=true;
+											}
+										}
+									}
+									if(!$ignore)
 									foreach($json_check['required_active_auths'] as $check_ignore){
+										if(!isset($custom_spam_list[$check_ignore])){
+											$custom_spam_list[$check_ignore]=1;
+										}
+										else{
+											$custom_spam_list[$check_ignore]++;
+										}
 										if(in_array($check_ignore,$ignore_list)){
 											$ignore=true;
 										}
 									}
+									if(!$ignore)
 									foreach($json_check['required_regular_auths'] as $check_ignore){
+										if(!isset($custom_spam_list[$check_ignore])){
+											$custom_spam_list[$check_ignore]=1;
+										}
+										else{
+											$custom_spam_list[$check_ignore]++;
+										}
 										if(in_array($check_ignore,$ignore_list)){
 											$ignore=true;
 										}

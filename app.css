@@ -1373,6 +1373,7 @@ td .view-key{
 	display:block;
 	max-width:100%;
 	overflow:auto;
+	word-break:break-all;
 }
 .view-account{
 	color:#006cf3;

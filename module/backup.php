@@ -20,12 +20,12 @@ $new_pid=posix_getpid();
 if($pid){
 	$working=posix_getpgid($pid);
 	if($working){
-		print 'VIZ Ops linking already working with PID: '.$pid.PHP_EOL;
+		print 'VIZ backup already working with PID: '.$pid.PHP_EOL;
 		exit;
 	}
 	else{
 		unlink($pid_file);
-		print 'VIZ Ops linking stopped, restarting... with PID: '.$new_pid.PHP_EOL;
+		print 'VIZ backup stopped, restarting... with PID: '.$new_pid.PHP_EOL;
 	}
 }
 file_put_contents($pid_file,$new_pid);
@@ -58,11 +58,15 @@ $tables=array(
 $start_time=microtime(true);
 $summary_filesize=0;
 foreach($tables as $table){
-	exec('rm /backup/'.$table.'.sql.gz');
+	exec('rm /backup/'.$table.'.sql.gz*');
 	exec('mysqldump -u"'.$config['db_login'].'" -p"'.$config['db_password'].'" '.$config['db_base'].' '.$table.' | gzip -9 > /backup/'.$table.'.sql.gz');
 	$current_time=microtime(true);
 	$current_work_time=(int)(1000*($current_time-$start_time));
 	$filesize=filesize('/backup/'.$table.'.sql.gz');
+	if($filesize>50*1024*1024){//split if more 50MB
+		exec('split -b50M /backup/'.$table.'.sql.gz /backup/'.$table.'.sql.gz.');
+		exec('rm /backup/'.$table.'.sql.gz');
+	}
 	$summary_filesize+=$filesize;
 	print $table.' table OK within '.$current_work_time.'ms ['.round($filesize/1024,2).'Kb]'.PHP_EOL;
 }
