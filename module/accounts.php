@@ -1,6 +1,6 @@
 <?php
 ob_start();
-$replace['title']='Аккаунты'.' - '.$replace['title'];
+$replace['title']=$ltmp_arr['accounts']['title'].' - '.$replace['title'];
 $lookup_account=$path_array[2];
 if($lookup_account){
 	if($lookup_account!=strtolower($lookup_account)){
@@ -10,12 +10,12 @@ if($lookup_account){
 	$account_arr=$db->sql_row("SELECT * FROM `accounts` WHERE `name`='".$db->prepare($lookup_account)."'");
 	if($account_arr['name']){
 		$replace['title']=$lookup_account.' - '.$replace['title'];
-		$replace['description']='Информация по аккаунту '.$lookup_account.' в блокчейне VIZ';
+		$replace['description']=ltmp($ltmp_arr['accounts']['personal_description'],['account'=>$lookup_account]);
 		print '
 		<div class="cards-view">
 			<div class="cards-container">
 				<div class="card">
-				<h2 class="left" title="Аккаунт">'.$lookup_account.'</h2>';
+				<h2 class="left" title="'.$ltmp_arr['accounts']['account'].'">'.$lookup_account.'</h2>';
 		$json=json_decode($account_arr['json'],true);
 		print '<div class="public-profile clearfix">';
 		$json['profile']['avatar_image']=$json['profile']['avatar'];
@@ -57,66 +57,66 @@ if($lookup_account){
 			<meta name="twitter:image" content="'.$json['profile']['avatar_image'].'"/>
 			<meta name="twitter:card" content="summary_large_image"/>';
 		}
-		print '<a href="'.htmlspecialchars($json['profile']['avatar']).'" target="_blank" rel="nofollow" title="Аватар"><img src="'.htmlspecialchars($json['profile']['avatar_image']).'" class="avatar"></a>';
+		print '<a href="'.htmlspecialchars($json['profile']['avatar']).'" target="_blank" rel="nofollow" title="'.$ltmp_arr['accounts']['avatar'].'"><img src="'.htmlspecialchars($json['profile']['avatar_image']).'" class="avatar"></a>';
 
 		print '<div class="information">';
 		if(!isset($json['profile']['nickname'])){
 			$json['profile']['nickname']='@'.$lookup_account;
 		}
-		print '<h3 class="left" title="Псевдоним">'.htmlspecialchars($json['profile']['nickname']).'</h3>';
-		$replace['description']='Карточка аккаунта @'.htmlspecialchars($lookup_account).' в блокчейне VIZ: история операций, социальный капитал, делегирование, публичные ключи, голоса за делегатов.';
+		print '<h3 class="left" title="'.$ltmp_arr['accounts']['nickname'].'">'.htmlspecialchars($json['profile']['nickname']).'</h3>';
+		$replace['description']=ltmp($ltmp_arr['accounts']['full_personal_description'],['account'=>htmlspecialchars($lookup_account)]);
 		if(!isset($json['profile']['about'])){
-			$json['profile']['about']='Отсутствует описание аккаунта';
+			$json['profile']['about']=$ltmp_arr['accounts']['empty_about'];
 		}
-		print '<p title="Об аккаунте">'.htmlspecialchars($json['profile']['about']).'</p>';
+		print '<p title="'.$ltmp_arr['accounts']['about'].'">'.htmlspecialchars($json['profile']['about']).'</p>';
 		if(isset($json['profile']['location'])){
-			print '<p class="grey small captions"><img src="/globe-ico.svg" class="icon-16" alt="Местоположение" title="Местоположение">'.htmlspecialchars($json['profile']['location']).'</p>';
+			print '<p class="grey small captions"><img src="/globe-ico.svg" class="icon-16" alt="'.$ltmp_arr['accounts']['location'].'" title="'.$ltmp_arr['accounts']['location'].'">'.htmlspecialchars($json['profile']['location']).'</p>';
 		}
 		if(isset($json['profile']['site'])){
-			print '<p class="grey small captions"><img src="/link.svg" class="icon-16" alt="Сайт" title="Сайт"><a target="_blank" href="/go/?url='.htmlspecialchars($json['profile']['site']).'">'.htmlspecialchars($json['profile']['site']).'</a></p>';
+			print '<p class="grey small captions"><img src="/link.svg" class="icon-16" alt="'.$ltmp_arr['accounts']['site'].'" title="'.$ltmp_arr['accounts']['site'].'"><a target="_blank" href="/go/?url='.htmlspecialchars($json['profile']['site']).'">'.htmlspecialchars($json['profile']['site']).'</a></p>';
 		}
 		if(isset($json['profile']['mail'])){
-			print '<p class="grey small captions"><img src="/mail.svg" class="icon-16" alt="Электронная почта" title="Электронная почта"><a target="_blank" href="mailto:'.htmlspecialchars($json['profile']['mail']).'">'.htmlspecialchars($json['profile']['mail']).'</a></p>';
+			print '<p class="grey small captions"><img src="/mail.svg" class="icon-16" alt="'.$ltmp_arr['accounts']['mail'].'" title="'.$ltmp_arr['accounts']['mail'].'"><a target="_blank" href="mailto:'.htmlspecialchars($json['profile']['mail']).'">'.htmlspecialchars($json['profile']['mail']).'</a></p>';
 		}
 		if(isset($json['profile']['interests'])){
 			if(is_array($json['profile']['interests'])){
 				if($json['profile']['interests'][0]){
-					print '<p class="grey small captions">Интересы: '.htmlspecialchars(implode(', ',$json['profile']['interests'])).'</p>';
+					print '<p class="grey small captions">'.$ltmp_arr['accounts']['interests'].' '.htmlspecialchars(implode(', ',$json['profile']['interests'])).'</p>';
 				}
 			}
 		}
 		if(isset($json['profile']['services'])){
-			print '<p class="grey small captions">Контакты: ';
+			print '<p class="grey small captions">'.$ltmp_arr['accounts']['services'].' ';
 			if(isset($json['profile']['services']['facebook'])){
 				$json['profile']['services']['facebook']=str_replace('https://www.facebook.com/','',$json['profile']['services']['facebook']);
-				print '<a href="/go/?url=https://www.facebook.com/'.htmlspecialchars($json['profile']['services']['facebook']).'" target="_blank" class="icon-link"><img src="/facebook.svg" class="icon-16" alt="Facebook" title="Facebook"></a>';
+				print '<a href="/go/?url=https://www.facebook.com/'.htmlspecialchars($json['profile']['services']['facebook']).'" target="_blank" class="icon-link"><img src="/facebook.svg" class="icon-16" alt="'.$ltmp_arr['accounts']['facebook'].'" title="'.$ltmp_arr['accounts']['facebook'].'"></a>';
 			}
 			if(isset($json['profile']['services']['instagram'])){
 				$json['profile']['services']['instagram']=str_replace('https://www.instagram.com/','',$json['profile']['services']['instagram']);
-				print '<a href="/go/?url=https://www.instagram.com/'.htmlspecialchars($json['profile']['services']['instagram']).'" target="_blank" class="icon-link"><img src="/instagram.svg" class="icon-16" alt="Instagram" title="Instagram"></a>';
+				print '<a href="/go/?url=https://www.instagram.com/'.htmlspecialchars($json['profile']['services']['instagram']).'" target="_blank" class="icon-link"><img src="/instagram.svg" class="icon-16" alt="'.$ltmp_arr['accounts']['instagram'].'" title="'.$ltmp_arr['accounts']['instagram'].'"></a>';
 			}
 			if(isset($json['profile']['services']['twitter'])){
 				$json['profile']['services']['twitter']=str_replace('https://twitter.com/','',$json['profile']['services']['twitter']);
-				print '<a href="/go/?url=https://twitter.com/'.htmlspecialchars($json['profile']['services']['twitter']).'" target="_blank" class="icon-link"><img src="/twitter.svg" class="icon-16" alt="Twitter" title="Twitter"></a>';
+				print '<a href="/go/?url=https://twitter.com/'.htmlspecialchars($json['profile']['services']['twitter']).'" target="_blank" class="icon-link"><img src="/twitter.svg" class="icon-16" alt="'.$ltmp_arr['accounts']['twitter'].'" title="'.$ltmp_arr['accounts']['twitter'].'"></a>';
 			}
 			if(isset($json['profile']['services']['vk'])){
 				$json['profile']['services']['vk']=str_replace('https://vk.com/','',$json['profile']['services']['vk']);
-				print '<a href="/go/?url=https://vk.com/'.htmlspecialchars($json['profile']['services']['vk']).'" target="_blank" class="icon-link"><img src="/vk.svg" class="icon-16" alt="Вконтакте" title="Вконтакте"></a>';
+				print '<a href="/go/?url=https://vk.com/'.htmlspecialchars($json['profile']['services']['vk']).'" target="_blank" class="icon-link"><img src="/vk.svg" class="icon-16" alt="'.$ltmp_arr['accounts']['vk'].'" title="'.$ltmp_arr['accounts']['vk'].'"></a>';
 			}
 			if(isset($json['profile']['services']['telegram'])){
 				if('@'==substr($json['profile']['services']['telegram'],0,1)){
 					$json['profile']['services']['telegram']=substr($json['profile']['services']['telegram'],1);
 				}
-				print '<a href="tg://resolve?domain='.htmlspecialchars($json['profile']['services']['telegram']).'" class="icon-link"><img src="/telegram.svg" class="icon-16" alt="Telegram" title="Telegram"></a>';
+				print '<a href="tg://resolve?domain='.htmlspecialchars($json['profile']['services']['telegram']).'" class="icon-link"><img src="/telegram.svg" class="icon-16" alt="'.$ltmp_arr['accounts']['telegram'].'" title="'.$ltmp_arr['accounts']['telegram'].'"></a>';
 			}
 			if(isset($json['profile']['services']['skype'])){
-				print '<a href="skype:'.htmlspecialchars($json['profile']['services']['skype']).'?call" target="_blank" class="icon-link"><img src="/skype.svg" class="icon-16" alt="Skype" title="Skype"></a>';
+				print '<a href="skype:'.htmlspecialchars($json['profile']['services']['skype']).'?call" target="_blank" class="icon-link"><img src="/skype.svg" class="icon-16" alt="'.$ltmp_arr['accounts']['services_skype'].'" title="'.$ltmp_arr['accounts']['services_skype'].'"></a>';
 			}
 			if(isset($json['profile']['services']['viber'])){
-				print '<a href="viber://pa/info?uri='.htmlspecialchars($json['profile']['services']['viber']).'" target="_blank" class="icon-link"><img src="/viber.svg" class="icon-16" alt="Viber" title="Viber"></a>';
+				print '<a href="viber://pa/info?uri='.htmlspecialchars($json['profile']['services']['viber']).'" target="_blank" class="icon-link"><img src="/viber.svg" class="icon-16" alt="'.$ltmp_arr['accounts']['services_viber'].'" title="'.$ltmp_arr['accounts']['services_viber'].'"></a>';
 			}
 			if(isset($json['profile']['services']['whatsapp'])){
-				print '<a href="/go/?url=https://wa.me/'.htmlspecialchars($json['profile']['services']['whatsapp']).'" target="_blank" class="icon-link"><img src="/whatsapp.svg" class="icon-16" alt="WhatsApp" title="WhatsApp"></a>';
+				print '<a href="/go/?url=https://wa.me/'.htmlspecialchars($json['profile']['services']['whatsapp']).'" target="_blank" class="icon-link"><img src="/whatsapp.svg" class="icon-16" alt="'.$ltmp_arr['accounts']['services_whatsapp'].'" title="'.$ltmp_arr['accounts']['services_whatsapp'].'"></a>';
 			}
 			print '</p>';
 		}
@@ -124,17 +124,17 @@ if($lookup_account){
 
 		print '</div>';
 
-		print '<p>Создан: <span class="view-date captions">'.($account_arr['created']?date('d.m.Y H:i:s',$account_arr['created']):'генезис').'</span></p>';
+		print '<p>'.$ltmp_arr['accounts']['created'].' <span class="view-date captions">'.($account_arr['created']?date('d.m.Y H:i:s',$account_arr['created']):$ltmp_arr['accounts']['genesis']).'</span></p>';
 		if($account_arr['receiver_awards']){
-			print '<p>Получено наград: <span class="view-tokens captions">'.number_format($account_arr['receiver_awards']/1000,2,'.','&nbsp;').' viz</span></p>';
+			print '<p>'.$ltmp_arr['accounts']['receiver_awards'].' <span class="view-tokens captions">'.number_format($account_arr['receiver_awards']/1000,2,'.','&nbsp;').' viz</span></p>';
 		}
 		if($account_arr['benefactor_awards']){
-			print '<p>Получено бенефициарских: <span class="view-tokens captions">'.number_format($account_arr['benefactor_awards']/1000,2,'.','&nbsp;').' viz</span></p>';
+			print '<p>'.$ltmp_arr['accounts']['benefactor_awards'].' <span class="view-tokens captions">'.number_format($account_arr['benefactor_awards']/1000,2,'.','&nbsp;').' viz</span></p>';
 		}
 
 
 		$keys_info='';
-		$keys_arr=array('1'=>'Мастер','2'=>'Активный','3'=>'Регулярный','4'=>'Мемо');
+		$keys_arr=array('1'=>$ltmp_arr['accounts']['keys_type_1'],'2'=>$ltmp_arr['accounts']['keys_type_2'],'3'=>$ltmp_arr['accounts']['keys_type_3'],'4'=>$ltmp_arr['accounts']['keys_type_4']);
 		$q=$db->sql("SELECT * FROM `accounts_keys` WHERE `account`='".$account_arr['id']."' ORDER BY `type` ASC");
 		while($m=$db->row($q)){
 			//$keys_info.='<p>'.$keys_arr[$m['type']].': <span class="view-key captions">'.$m['key'].'</span></p>';
@@ -142,14 +142,14 @@ if($lookup_account){
 		}
 		if($keys_info){
 			print '<hr>';
-			print '<h3 class="left">Публичные ключи</h3>';
+			print '<h3 class="left">'.$ltmp_arr['accounts']['public_keys'].'</h3>';
 			print '<table class="captions sortable-theme-slick" width="100%" data-sortable="false">';
 			print '<thead>';
 			print '
 			<tr>
-				<th width="33.33%">Тип доступа</th>
-				<th width="33.33%">Публичный ключ</th>
-				<th width="33.33%">Вес / Необходимый</th>
+				<th width="33.33%">'.$ltmp_arr['accounts']['authority_type'].'</th>
+				<th width="33.33%">'.$ltmp_arr['accounts']['public_key'].'</th>
+				<th width="33.33%">'.$ltmp_arr['accounts']['weight_threshold'].'</th>
 			</tr>';
 			print '</thead>';
 			print '<tbody>';
@@ -159,26 +159,26 @@ if($lookup_account){
 		}
 
 		$auths_info='';
-		$auths_arr=array('1'=>'Мастер доступ','2'=>'Активный доступ','3'=>'Регулярный доступ');
+		$auths_arr=array('1'=>$ltmp_arr['accounts']['authority_type_1'],'2'=>$ltmp_arr['accounts']['authority_type_2'],'3'=>$ltmp_arr['accounts']['authority_type_3']);
 		$q=$db->sql("SELECT * FROM `accounts_authority` WHERE `account`='".$account_arr['id']."' ORDER BY `type` ASC");
 		while($m=$db->row($q)){
 			$auths_info.='<p>'.$auths_arr[$m['type']].': <a class="view-account captions" href="/accounts/'.get_account_name($m['agent']).'/">'.get_account_name($m['agent']).'</a>, вес '.round($m['weight']/$m['weight_threshold']*100,2).'%</p>';
 		}
 		if($auths_info){
 			print '<hr>';
-			print '<h3 class="left">Доверенные аккаунты</h3>';
+			print '<h3 class="left">'.$ltmp_arr['accounts']['delegated_authority'].'</h3>';
 			print $auths_info;
 		}
 
 		print '<hr>';
-		print '<h3 class="left">Активы</h3>';
+		print '<h3 class="left">'.$ltmp_arr['accounts']['assets'].'</h3>';
 		print '<table class="balances captions sortable-theme-slick table-max-500" width="100%" data-sortable="false">';
 		print '<thead>';
 		print '
 		<tr>
-			<th class="text-right" width="33.33%">Капитал (viz)</th>
-			<th class="text-right" width="33.33%">Кошелёк (viz)</th>
-			<th class="text-right">Энергия (%)</th>
+			<th class="text-right" width="33.33%">'.$ltmp_arr['accounts']['capital'].'</th>
+			<th class="text-right" width="33.33%">'.$ltmp_arr['accounts']['balance'].'</th>
+			<th class="text-right">'.$ltmp_arr['accounts']['energy'].'</th>
 		</tr>';
 		print '</thead>';
 		print '<tbody>';
@@ -187,14 +187,14 @@ if($lookup_account){
 			$account_arr['to_withdraw']=0;
 		}
 		else{
-			$withdraw_info='<span class="red" title="Включено уменьшение">➘</span> ';
+			$withdraw_info='<span class="red" title="'.$ltmp_arr['accounts']['withdraw_enabled'].'">➘</span> ';
 		}
 		$delegation_info='';
 		if($account_arr['received']){
-			$delegation_info.='<br><span class="green" title="Входящее делегирование">+'.number_format($account_arr['received']/1000000,2,'.','&nbsp;').'</span>';
+			$delegation_info.='<br><span class="green" title="'.$ltmp_arr['accounts']['income_delegation'].'">+'.number_format($account_arr['received']/1000000,2,'.','&nbsp;').'</span>';
 		}
 		if($account_arr['delegated']){
-			$delegation_info.='<br><span class="red" title="Исходящее делегирование">−'.number_format($account_arr['delegated']/1000000,2,'.','&nbsp;').'</span>';
+			$delegation_info.='<br><span class="red" title="'.$ltmp_arr['accounts']['outcome_delegation'].'">−'.number_format($account_arr['delegated']/1000000,2,'.','&nbsp;').'</span>';
 		}
 		$new_energy=$account_arr['energy']+((time()-$account_arr['last_vote_time'])*10000/432000);//5 days
 		if($new_energy>10000){
@@ -210,46 +210,53 @@ if($lookup_account){
 		print '</table>';
 
 		$delegations='';
+		$reclaimed='';
 		$q=$db->sql("SELECT * FROM `delegations` WHERE (`from`='".$account_arr['id']."' OR `to`='".$account_arr['id']."') AND `shares`>0 ORDER BY `shares` DESC");
 		while($m=$db->row($q)){
 			$delegation_info='';
 			$target_account='';
 			if($m['from']==$m['to']){
-				$target_account='Отозвано';
+				$target_account=$ltmp_arr['accounts']['delegations_reclaimed'];
 				$delegation_info=number_format($m['shares']/1000000,2,'.','&nbsp;');
+				$reclaimed.='
+				<tr>
+					<td>'.$target_account.'</td>
+					<td class="text-right "><span class="text-big">'.$delegation_info.'</td>
+				</tr>';
 			}
 			else{
 				if($account_arr['id']==$m['to']){
-					$delegation_info.='<span class="green" title="Входящее делегирование">+'.number_format($m['shares']/1000000,2,'.','&nbsp;').'</span>';
+					$delegation_info.='<span class="green" title="'.$ltmp_arr['accounts']['income_delegation'].'">+'.number_format($m['shares']/1000000,2,'.','&nbsp;').'</span>';
 					$target_account=get_account_name($m['from']);
 					$target_account='<a href="/accounts/'.$target_account.'/" class="view-account">'.$target_account.'</a>';
 				}
 				else{
-					$delegation_info.='<span class="red" title="Исходящее делегирование">−'.number_format($m['shares']/1000000,2,'.','&nbsp;').'</span>';
+					$delegation_info.='<span class="red" title="'.$ltmp_arr['accounts']['outcome_delegation'].'">−'.number_format($m['shares']/1000000,2,'.','&nbsp;').'</span>';
 					$target_account=get_account_name($m['to']);
 					$target_account='<a href="/accounts/'.$target_account.'/" class="view-account">'.$target_account.'</a>';
 				}
+				$delegations.='
+				<tr>
+					<td>'.$target_account.'</td>
+					<td class="text-right "><span class="text-big">'.$delegation_info.'</td>
+				</tr>';
 			}
-			$delegations.='
-			<tr>
-				<td>'.$target_account.'</td>
-				<td class="text-right "><span class="text-big">'.$delegation_info.'</td>
-			</tr>';
 		}
-		if($delegations){
+		if(''!=$delegations || ''!=$reclaimed){
 			print '<hr>';
-			print '<h3 class="left">Делегирование</h3>';
+			print '<h3 class="left">'.$ltmp_arr['accounts']['delegations'].'</h3>';
 
 			print '<table class="delegations captions sortable-theme-slick table-max-500" width="100%" data-sortable="false">';
 			print '<thead>';
 			print '
 			<tr>
-				<th width="33.33%">Аккаунт</th>
-				<th class="text-right">Капитал (viz)</th>
+				<th width="33.33%">'.$ltmp_arr['accounts']['delegations_account'].'</th>
+				<th class="text-right">'.$ltmp_arr['accounts']['delegations_amount'].'</th>
 			</tr>';
 			print '</thead>';
 			print '<tbody>';
 			print $delegations;
+			print $reclaimed;
 			print '</tbody>';
 			print '</table>';
 		}
@@ -469,9 +476,9 @@ if($lookup_account){
 		*/
 
 		print '<hr>';
-		print '<h3 class="left">ДАО</h3>';
+		print '<h3 class="left">'.$ltmp_arr['accounts']['dao'].'</h3>';
 		$is_witness=$db->select_one('witnesses','id',"WHERE `account`='".$account_arr['id']."' AND `signing_key`!='VIZ1111111111111111111111111111111114T1Anm'");
-		print '<p>Делегат: '.($is_witness?'<a href="/witnesses/'.$account_arr['name'].'/" class="green">Да</a>':'<span class="red">Нет</span>').'</p>';
+		print '<p>'.$ltmp_arr['accounts']['dao_witness'].' '.($is_witness?'<a href="/witnesses/'.$account_arr['name'].'/" class="green">'.$ltmp_arr['accounts']['dao_witness_yes'].'</a>':'<span class="red">'.$ltmp_arr['accounts']['dao_witness_no'].'</span>').'</p>';
 		$witnesses=array();
 		$q=$db->sql("SELECT * FROM `witnesses_votes` WHERE `account`='".$account_arr['id']."'");
 		while($m=$db->row($q)){
@@ -480,17 +487,17 @@ if($lookup_account){
 		}
 
 		if(count($witnesses)>0){
-			print '<p>Вес голоса за делегата: <span class="view-tokens captions">'.(number_format($account_arr['witnesses_vote_weight']/1000000,0,'.',' ')).' viz</span></p>';
-			print '<p>Список голосов за делегатов: ';
+			print '<p>'.$ltmp_arr['accounts']['dao_witness_vote_weight'].' <span class="view-tokens captions">'.(number_format($account_arr['witnesses_vote_weight']/1000000,0,'.',' ')).' viz</span></p>';
+			print '<p>'.$ltmp_arr['accounts']['dao_witness_votes'].' ';
 			print implode(', ',$witnesses);
 			print '</p>';
 		}
 		else{
-			print '<p>Голоса за делегатов: <span class="red">Отсутствуют</span></p>';
+			print '<p>'.$ltmp_arr['accounts']['dao_witness_votes_empty'].'</p>';
 		}
 
 		print '<hr>';
-		print '<h3 class="left">История операций</h3>';
+		print '<h3 class="left">'.$ltmp_arr['accounts']['history'].'</h3>';
 		print '<div class="ops-history-table">';
 		$ops_arr=array();
 		$q=$db->sql("SELECT `id`,`name` FROM `ops_type`");
@@ -498,17 +505,17 @@ if($lookup_account){
 			$ops_arr[$m['id']]=$m['name'];
 		}
 		$type_arr=array(
-			'Аккаунты'=>array(12,28,5,45,46,47,48),
-			'Капитал'=>array(4,8,19,21,29,31),
-			'Переводы'=>array(7,21,24,26,30),
-			'Награды'=>array(37,38,40),
-			'ДАО'=>array(3,6,14,22,23,27,32,33,34,36),
-			'Подписки'=>array(41,42,43,44,),
+			$ltmp_arr['accounts']['history_types_accounts']=>array(12,28,5,45,46,47,48),
+			$ltmp_arr['accounts']['history_types_capital']=>array(4,8,19,21,29,31),
+			$ltmp_arr['accounts']['history_types_transfers']=>array(7,21,24,26,30),
+			$ltmp_arr['accounts']['history_types_rewards']=>array(37,38,40),
+			$ltmp_arr['accounts']['history_types_dao']=>array(3,6,14,22,23,27,32,33,34,36),
+			$ltmp_arr['accounts']['history_types_subscriptions']=>array(41,42,43,44,),
 		);
 		print '<p>
-		<input type="text" placeholder="Поиск" class="right simple-rounded table-ops-history-search">
+		<input type="text" placeholder="'.$ltmp_arr['accounts']['history_search'].'" class="right simple-rounded table-ops-history-search">
 		<select class="table-ops-history-selector simple-rounded">';
-		print '<option value="" selected>Все</option>';
+		print '<option value="" selected>'.$ltmp_arr['accounts']['history_types_all'].'</option>';
 		foreach($type_arr as $type_name=>$type_vars){
 			print '<option value="'.implode(',',$type_vars).'">'.$type_name.'</option>';
 		}
@@ -517,9 +524,9 @@ if($lookup_account){
 		print '<thead>';
 		print '
 		<tr>
-			<th width="10%">Время (GMT)</th>
-			<!--<th>Операция</th>-->
-			<th>Описание</th>
+			<th width="10%">'.$ltmp_arr['accounts']['history_time'].'</th>
+			<!--<th>'.$ltmp_arr['accounts']['history_op'].'</th>-->
+			<th>'.$ltmp_arr['accounts']['history_descr'].'</th>
 		</tr>';
 		print '</thead>';
 		print '<tbody>';
@@ -814,7 +821,7 @@ if($lookup_account){
 			else
 			if(48==$m['type']){
 				$op_type='account_sale';
-				$descr=ltmp($ltmp_arr['ops-history'][$op_type],['account'=>$op_json['account'],'buyer'=>$op_json['buyer'],'tokens'=>short_viz($op_json['price'])]);
+				$descr=ltmp($ltmp_arr['ops-history'][$op_type],['account'=>$op_json['account'],'seller'=>$op_json['seller'],'buyer'=>$op_json['buyer'],'tokens'=>short_viz($op_json['price'])]);
 			}
 			else
 			if(56==$m['type']){
@@ -838,7 +845,7 @@ if($lookup_account){
 		print '</table>';
 		print '<div class="pagination">';
 		if($count==$per_page){
-			print '<a class="button unselectable load-more-button">Показать больше записей&hellip;</a>';
+			print '<a class="button unselectable load-more-button">'.$ltmp_arr['accounts']['history_load_more'].'</a>';
 		}
 		print '</div>';
 
@@ -850,7 +857,7 @@ if($lookup_account){
 	}
 }
 else{
-	$replace['description']='Таблица аккаунтов в блокчейне VIZ';
+	$replace['description']=$ltmp_arr['accounts']['description'];
 	print '
 	<div class="cards-view">
 		<div class="cards-container">
@@ -875,12 +882,12 @@ else{
 	if(''!=$search){
 		$addon=' WHERE `name` LIKE \'%'.$db->prepare($search).'%\'';
 	}
-	print '<h1>Аккаунты</h1>';
+	print '<h1>'.$ltmp_arr['accounts']['title'].'</h1>';
 	print '<p>
-	Всего аккаунтов: <span class="captions">'.$db->table_count('accounts').'</span><br>
-	Из них имеют токены viz: <span class="captions">'.$db->table_count('accounts',' WHERE `balance`+`shares`!=0').'</span>
+	'.$ltmp_arr['accounts']['count_all'].' <span class="captions">'.$db->table_count('accounts').'</span><br>
+	'.$ltmp_arr['accounts']['count_with_assets'].' <span class="captions">'.$db->table_count('accounts',' WHERE `balance`+`shares`!=0').'</span>
 	</p>';
-	print '<p><input class="simple-rounded accounts-search-text" placeholder="Имя аккаунта" value="'.htmlspecialchars($search).'"></p>';
+	print '<p><input class="simple-rounded accounts-search-text" placeholder="'.$ltmp_arr['accounts']['search_login'].'" value="'.htmlspecialchars($search).'"></p>';
 	print '<div class="accounts-table" data-type="'.$type.'">';
 	print '<table class="accounts captions sortable-theme-slick" width="100%" data-sortable="false">';
 	print '<thead>';
@@ -888,11 +895,11 @@ else{
 	print '
 	<tr>
 		<th data-field="num">#</th>
-		<th data-field="account">Аккаунт</th>
-		<th class="text-right right-border" title="Действующий социальный капитал с учетом делегированного исходящего и входящего капиталов"'.($type=='effective'?$th_sorted:'').'><a data-type="effective" href="/accounts/?type=effective">Действующий капитал</a></th>
-		<th class="text-right" '.($type=='shares'?$th_sorted:'').'><a data-type="shares" href="/accounts/?type=shares">Собственный капитал</a></th>
-		<th class="text-right" title="Баланс переносимых токенов VIZ"'.($type=='tokens'?$th_sorted:'').'><a data-type="tokens" href="/accounts/?type=tokens">Кошелёк</a></th>
-		<th class="text-right" title="Сумма собственного капитала и токенов"'.($type=='summary'?$th_sorted:'').'><a data-type="summary" href="/accounts/?type=summary">Сумма</a></th>
+		<th data-field="account">'.$ltmp_arr['accounts']['account'].'</th>
+		<th class="text-right right-border" title="'.$ltmp_arr['accounts']['effective_capital_description'].'"'.($type=='effective'?$th_sorted:'').'><a data-type="effective" href="/accounts/?type=effective">'.$ltmp_arr['accounts']['effective_capital'].'</a></th>
+		<th class="text-right" '.($type=='shares'?$th_sorted:'').'><a data-type="shares" href="/accounts/?type=shares">'.$ltmp_arr['accounts']['self_capital'].'</a></th>
+		<th class="text-right" title="'.$ltmp_arr['accounts']['balance_description'].'"'.($type=='tokens'?$th_sorted:'').'><a data-type="tokens" href="/accounts/?type=tokens">'.$ltmp_arr['accounts']['balance'].'</a></th>
+		<th class="text-right" title="'.$ltmp_arr['accounts']['summary_description'].'"'.($type=='summary'?$th_sorted:'').'><a data-type="summary" href="/accounts/?type=summary">'.$ltmp_arr['accounts']['summary'].'</a></th>
 	</tr>';
 	print '</thead>';
 	print '<tbody>';
@@ -925,7 +932,7 @@ else{
 			$m['to_withdraw']=0;
 		}
 		else{
-			$withdraw_info='<span class="red" title="Включено уменьшение">➘</span> ';
+			$withdraw_info='<span class="red" title="'.$ltmp_arr['accounts']['withdraw_enabled'].'">➘</span> ';
 		}
 		if($m['activity']<$m['created']){
 			$m['activity']=$m['created'];
@@ -942,16 +949,16 @@ else{
 		$num++;
 	}
 	if($num==(1+$offset)){
-		print '<tr><td colspan="6">Ничего не найдено, попробуйте задать другие условия для поиска.</td></tr>';
+		print '<tr><td colspan="6">'.$ltmp_arr['accounts']['empty_result'].'</td></tr>';
 	}
 	print '</tbody>';
 	print '</table>';
 	print '<div class="pagination">';
 	if($page>0){
-		print '<a href="?page='.($page).($search?'&search='.urlencode($search):'').($type?'&type='.urlencode($type):'').'" class="button unselectable page-button" data-page="'.$page.'">&larr; Предыдущая страница</a>';
+		print '<a href="?page='.($page).($search?'&search='.urlencode($search):'').($type?'&type='.urlencode($type):'').'" class="button unselectable page-button" data-page="'.$page.'">'.$ltmp_arr['accounts']['prev_page'].'</a>';
 	}
 	if($page<$pages){
-		print '<a href="?page='.(2+$page).($search?'&search='.urlencode($search):'').($type?'&type='.urlencode($type):'').'" class="button unselectable page-button" data-page="'.(2+$page).'">Следующая страница &rarr;</a>';
+		print '<a href="?page='.(2+$page).($search?'&search='.urlencode($search):'').($type?'&type='.urlencode($type):'').'" class="button unselectable page-button" data-page="'.(2+$page).'">'.$ltmp_arr['accounts']['next_page'].'</a>';
 	}
 	print '</div>';
 	print '</div>';

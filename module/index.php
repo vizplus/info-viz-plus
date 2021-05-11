@@ -1,5 +1,8 @@
 <?php
 ob_start();
+$props_list_descr=$ltmp_arr['props_descr'];
+$props_list_descr_type=$ltmp_arr['props_descr_type'];
+$props_list_item=$ltmp_arr['props_item'];
 if('go'==$path_array[1]){
 	if($_GET['url']){
 		header('location:'.$_GET['url']);
@@ -23,66 +26,16 @@ if('props'==$path_array[1]){
 			header('location:/props/'.strtolower($prop).'/');
 			exit;
 		}
-		$props_list_descr=[
-			'account_creation_fee'=>'Стоимость создания аккаунта (viz)',
-			'create_account_delegation_ratio'=>'Стоимость создания аккаунта делегированием (делегированных viz)',
-			'create_account_delegation_time'=>'Срок делегирования при создании аккаунта (суток)',
-			'bandwidth_reserve_percent'=>'Резерв пропускной способности для микроаккаунтов (%)',
-			'bandwidth_reserve_below'=>'Максимальный капитал микроаккаунта (viz)',
-			'maximum_block_size'=>'Максимальный размер блока (байт)',
-			'data_operations_cost_additional_bandwidth'=>'Дополнительная наценка пропускной способности за каждую data операцию в транзакции (%)',
-			'min_delegation'=>'Минимальное количество токенов при делегировании (viz)',
-			'vote_accounting_min_rshares'=>'Минимальный размер награждающего капитала (viz)',
-			'committee_request_approve_min_percent'=>'Минимальная доля совокупного социального капитала для решения по заявке в Фонде ДАО (%)',
-			'witness_miss_penalty_percent'=>'Штраф делегату за пропуск блока (% суммарного веса голосов за делегата)',
-			'witness_miss_penalty_duration'=>'Продолжительность штрафа делегату за пропуск блока (суток)',
-			'inflation_witness_percent'=>'Доля эмиссии, идущая на вознаграждение делегатов',
-			'inflation_ratio_committee_vs_reward_fund'=>'Доля оставшейся эмиссии, идущая в Фонд ДАО (остальное - в Фонд наград)',
-			'inflation_recalc_period'=>'Срок фиксации эмиссионной модели',
-
-			'create_invite_min_balance'=>'Минимальная сумма чека (viz)',
-			'committee_create_request_fee'=>'Плата за создание заявки в Фонд ДАО (viz)',
-			'create_paid_subscription_fee'=>'Плата за создание платной подписки (viz)',
-			'account_on_sale_fee'=>'Плата за выставление аккаунта на продажу (viz)',
-			'subaccount_on_sale_fee'=>'Плата за выставление субаккаунтов на продажу (viz)',
-			'witness_declaration_fee'=>'Плата за объявление аккаунта делегатом (viz)',
-			'withdraw_intervals'=>'Количество периодов (дней) уменьшения капитала',
-		];
-		$props_list_item=[
-			'account_creation_fee'=>'viz',
-			'create_account_delegation_ratio'=>'viz',
-			'create_account_delegation_time'=>'сут.',
-			'bandwidth_reserve_percent'=>'%',
-			'bandwidth_reserve_below'=>'viz',
-			'maximum_block_size'=>'байт',
-			'data_operations_cost_additional_bandwidth'=>'%',
-			'min_delegation'=>'viz',
-			'vote_accounting_min_rshares'=>'viz',
-			'committee_request_approve_min_percent'=>'%',
-			'witness_miss_penalty_percent'=>'%',
-			'witness_miss_penalty_duration'=>'сут.',
-			'inflation_recalc_period'=>'сут.',
-			'inflation_witness_percent'=>'%',
-			'inflation_ratio_committee_vs_reward_fund'=>'%',
-
-			'create_invite_min_balance'=>'viz',
-			'committee_create_request_fee'=>'viz',
-			'create_paid_subscription_fee'=>'viz',
-			'account_on_sale_fee'=>'viz',
-			'subaccount_on_sale_fee'=>'viz',
-			'witness_declaration_fee'=>'viz',
-			'withdraw_intervals'=>'',
-		];
 		$chain_props=$db->sql_row("SELECT * FROM `chain_props_snapshot` ORDER BY `id` DESC LIMIT 1");
-		$replace['title']='Параметр '.$prop.' - '.$replace['title'];
-		$replace['description']=$props_list_descr[$prop];
+		$replace['title']=''.$ltmp_arr['index']['prop_title'].' '.$prop.' - '.$replace['title'];
+		$replace['description']=$props_list_descr[$prop].(isset($props_list_descr_type[$prop])?' ('.$props_list_descr_type[$prop].')':'');
 		print '
 		<div class="cards-view">
 			<div class="cards-container">
 				<div class="card">
-				<h2 class="left">Параметр <span class="secondary">'.$prop.'</span></h2>';
+				<h2 class="left">'.$ltmp_arr['index']['prop_title'].' <span class="secondary">'.$prop.'</span></h2>';
 
-		print '<p>'.$props_list_descr[$prop].'</p>';
+		print '<p>'.$props_list_descr[$prop].(isset($props_list_descr_type[$prop])?' ('.$props_list_descr_type[$prop].')':'').'</p>';
 		$current_value=$chain_props[$prop];
 		if('maximum_block_size'==$prop){
 			$current_value=$chain_props['maximum_block_size'];
@@ -152,16 +105,16 @@ if('props'==$path_array[1]){
 			$current_value=$chain_props['withdraw_intervals'];
 		}
 
-		print '<p>Значение для диапазона блоков <span class="captions">'.$chain_props['current_shuffle_block'].'&ndash;'.$chain_props['next_shuffle_block'].': '.$current_value.('%'==$props_list_item[$prop]?$props_list_item[$prop]:' '.$props_list_item[$prop]).'</span></p>';
+		print '<p>'.$ltmp_arr['index']['prop_value_range'].' <span class="captions">'.$chain_props['current_shuffle_block'].'&ndash;'.$chain_props['next_shuffle_block'].': '.$current_value.('%'==$props_list_item[$prop]?$props_list_item[$prop]:' '.$props_list_item[$prop]).'</span></p>';
 
-		print '<h3 class="left">Параметры делегатов</h3>';
+		print '<h3 class="left">'.$ltmp_arr['index']['prop_witnesses_values'].'</h3>';
 		print '<table class="witnesses captions sortable-theme-slick" width="50%" data-sortable>';
 		print '<thead>';
 		print '
 		<tr>
 			<th data-sorted="true" data-sorted-direction="descending" data-field="num" data-sortable-type="int">#</th>
-			<th data-field="account">Делегат</th>
-			<th data-field="prop_value">Параметр</th>
+			<th data-field="account">'.$ltmp_arr['index']['prop_table_witness'].'</th>
+			<th data-field="prop_value">'.$ltmp_arr['index']['prop_table_name'].'</th>
 		</tr>';
 		print '</thead>';
 		print '<tbody>';
@@ -258,14 +211,14 @@ if('props'==$path_array[1]){
 		print '</tbody>';
 		print '</table>';
 
-		print '<br><h3 class="left">Динамика изменений</h3>';
+		print '<br><h3 class="left">'.$ltmp_arr['index']['prop_change_dynamics'].'</h3>';
 		$table_str='';
 		$table_str.='<table class="chain-props captions sortable-theme-slick" data-sortable="false">';
 		$table_str.='<thead>';
 		$table_str.='
 		<tr>
-			<th>Время</th>
-			<th>Значение</th>
+			<th>'.$ltmp_arr['index']['prop_table_time'].'</th>
+			<th>'.$ltmp_arr['index']['prop_table_value'].'</th>
 		</tr>';
 		$table_str.='</thead>';
 		$table_str.='<tbody>';
@@ -486,7 +439,7 @@ if('props'==$path_array[1]){
 }
 else
 if(''==$path_array[1]){
-	$replace['title']='Главная - '.$replace['title'];
+	$replace['title']=$ltmp_arr['index']['title'].' - '.$replace['title'];
 	$replace['index_page_selected']=' selected';
 	$th_sorted=' data-sorted="true" data-sorted-direction="descending"';
 	$dgp=$db->sql_row("SELECT * FROM `dgp_snapshot` ORDER BY `id` DESC LIMIT 1");
@@ -504,8 +457,8 @@ if(''==$path_array[1]){
 	<div class="cards-view">
 		<div class="cards-container">
 			<div class="card">
-				<h1 class="main">Состояние блокчейна VIZ
-				<div class="captions"> на '.(date('d.m.Y H:i:s',$dgp['time'])).' GMT</div>
+				<h1 class="main">'.$ltmp_arr['index']['state_title'].'
+				<div class="captions"> '.$ltmp_arr['index']['state_date'].' '.(date('d.m.Y H:i:s',$dgp['time'])).' GMT</div>
 				</h1>
 			';
 
@@ -519,10 +472,10 @@ if(''==$path_array[1]){
 		//$charts_arr['capacity'][]=[($m['time'])*1000,floatval((int)$m['capacity']/100)];
 	}
 	$chart_str_arr=[];
-	$chart_str_arr['accounts_1']='{name:\''.addslashes('за 1 день').'\',data:'.json_encode($charts_arr['accounts_1']).'}';
-	$chart_str_arr['accounts_7']='{name:\''.addslashes('за 7 дней').'\',data:'.json_encode($charts_arr['accounts_7']).'}';
-	$chart_str_arr['accounts_30']='{name:\''.addslashes('за 30 дней').'\',data:'.json_encode($charts_arr['accounts_30']).'}';
-	$chart_str_arr['trx_count']='{name:\''.addslashes('за сутки').'\',data:'.json_encode($charts_arr['trx_count']).'}';
+	$chart_str_arr['accounts_1']='{name:\''.addslashes($ltmp_arr['index']['chart_in_1_day']).'\',data:'.json_encode($charts_arr['accounts_1']).'}';
+	$chart_str_arr['accounts_7']='{name:\''.addslashes($ltmp_arr['index']['chart_in_7_days']).'\',data:'.json_encode($charts_arr['accounts_7']).'}';
+	$chart_str_arr['accounts_30']='{name:\''.addslashes($ltmp_arr['index']['chart_in_30_days']).'\',data:'.json_encode($charts_arr['accounts_30']).'}';
+	$chart_str_arr['trx_count']='{name:\''.addslashes($ltmp_arr['index']['chart_per_day']).'\',data:'.json_encode($charts_arr['trx_count']).'}';
 	//$chart_str_arr['capacity']='{name:\''.addslashes('средняя за неделю').'\',data:'.json_encode($charts_arr['capacity']).'}';
 
 	print '<div id="activity" class="index-charts selected"></div>';
@@ -544,14 +497,14 @@ if(''==$path_array[1]){
 		},
 		colors:['#0071d2','#389bf1','#67b8ff','#9dd1ff'],
 		title: {
-			text: 'Количество активных аккаунтов'
+			text: '".$ltmp_arr['index']['chart_accounts_amount']."'
 		},
 		xAxis: {
 			type: 'datetime'
 		},
 		yAxis: {
 			title: {
-				text: 'Количество',
+				text: '".$ltmp_arr['index']['chart_amount']."',
 			},
 			opposite: true,
 		},
@@ -737,14 +690,14 @@ if(''==$path_array[1]){
 		},
 		colors:['#0071d2','#389bf1','#67b8ff','#9dd1ff'],
 		title: {
-			text: 'Количество транзакций'
+			text: '".$ltmp_arr['index']['chart_trx_amount']."'
 		},
 		xAxis: {
 			type: 'datetime'
 		},
 		yAxis: {
 			title: {
-				text: 'Количество',
+				text: '".$ltmp_arr['index']['chart_amount']."',
 			},
 			opposite: true,
 		},
@@ -852,22 +805,22 @@ if(''==$path_array[1]){
 	$day_offset_block=$db->select_one('blocks','id',"WHERE `time`>='".$day_offset."'");
 	$week_offset=$time-604800;//7 days
 	$month_offset=$time-2592000;//30 days
-	print '<h2 class="left">Активность</h2>';
+	print '<h2 class="left">'.$ltmp_arr['index']['activity'].'</h2>';
 	print '<div class="columns-view">';
 	print '<div class="column column-2 thin">';
 	print '<table class="users-activity captions sortable-theme-slick" width="100%" data-sortable="false">';
 	print '<thead>';
 	print '
 	<tr>
-		<th>Период</th>
-		<th class="text-right">Аккаунты</th>
+		<th>'.$ltmp_arr['index']['period'].'</th>
+		<th class="text-right">'.$ltmp_arr['index']['accounts'].'</th>
 	</tr>';
 	print '</thead>';
 	print '<tbody>';
-	print '<tr><td>За 30 дней</td><td class="text-right"><a class="index-charts-selector" rel="activity">'.$db->table_count('accounts',"WHERE `activity`>'".$month_offset."'").'</a></td></tr>';
-	print '<tr><td>За 7 дней</td><td class="text-right">'.$db->table_count('accounts',"WHERE `activity`>'".$week_offset."'").'</td></tr>';
-	print '<tr><td>За 1 день</td><td class="text-right">'.$db->table_count('accounts',"WHERE `activity`>'".$day_offset."'").'</td></tr>';
-	print '<tr><td>За 1 час</td><td class="text-right">'.$db->table_count('accounts',"WHERE `activity`>'".$hour_offset."'").'</td></tr>';
+	print '<tr><td>'.$ltmp_arr['index']['in_30_days'].'</td><td class="text-right"><a class="index-charts-selector" rel="activity">'.$db->table_count('accounts',"WHERE `activity`>'".$month_offset."'").'</a></td></tr>';
+	print '<tr><td>'.$ltmp_arr['index']['in_7_days'].'</td><td class="text-right">'.$db->table_count('accounts',"WHERE `activity`>'".$week_offset."'").'</td></tr>';
+	print '<tr><td>'.$ltmp_arr['index']['in_1_day'].'</td><td class="text-right">'.$db->table_count('accounts',"WHERE `activity`>'".$day_offset."'").'</td></tr>';
+	print '<tr><td>'.$ltmp_arr['index']['in_1_hour'].'</td><td class="text-right">'.$db->table_count('accounts',"WHERE `activity`>'".$hour_offset."'").'</td></tr>';
 	print '</tbody></table>';
 	print '</div>';
 
@@ -876,60 +829,60 @@ if(''==$path_array[1]){
 	print '<thead>';
 	print '
 	<tr>
-		<th>Блоки</th>
-		<th width="40%">Значение</th>
+		<th>'.$ltmp_arr['index']['blocks'].'</th>
+		<th width="40%">'.$ltmp_arr['index']['value'].'</th>
 	</tr>';
 	print '</thead>';
 	print '<tbody>';
-	print '<tr><td>Средний размер блока</td><td>'.($dgp['average_block_size']).' байт</td></tr>';
-	print '<tr><td>Заполнение блока</td><td>'.round($dgp['average_block_size']/$dgp['maximum_block_size']*100,2).'%</td></tr>';
-	print '<tr><td>Транзакций за сутки</td><td><a class="index-charts-selector" rel="trx-count">'.($db->table_count('trx',"WHERE `block`>='".$day_offset_block."'")).'</a></td></tr>';
-	print '<tr><td title="Ограничение пропускной способности">Доступность сети</td><td>'.round($dgp['current_reserve_ratio']/20000*100,2).'%</td></tr>';
+	print '<tr><td>'.$ltmp_arr['index']['average_block_size'].'</td><td>'.($dgp['average_block_size']).' '.$ltmp_arr['props_item']['maximum_block_size'].'</td></tr>';//byte
+	print '<tr><td>'.$ltmp_arr['index']['block_filling'].'</td><td>'.round($dgp['average_block_size']/$dgp['maximum_block_size']*100,2).'%</td></tr>';
+	print '<tr><td>'.$ltmp_arr['index']['trx_count'].'</td><td><a class="index-charts-selector" rel="trx-count">'.($db->table_count('trx',"WHERE `block`>='".$day_offset_block."'")).'</a></td></tr>';
+	print '<tr><td title="'.$ltmp_arr['index']['bandwidth_limitation'].'">'.$ltmp_arr['index']['network_accessibility'].'</td><td>'.round($dgp['current_reserve_ratio']/20000*100,2).'%</td></tr>';
 	print '</tbody></table>';
 	print '</div>';
 
 	print '</div>';
 
-	print '<h2 class="left">Экономика</h2>';
+	print '<h2 class="left">'.$ltmp_arr['index']['economy'].'</h2>';
 	print '<div class="columns-view">';
 	print '<div class="column column-2 thin">';
 	print '<table class="funds captions sortable-theme-slick" width="100%" data-sortable="false">';
 	print '<thead>';
 	print '
 	<tr>
-		<th width="50%">Токены</th>
-		<th class="text-right">Количество, viz</th>
+		<th width="50%">'.$ltmp_arr['index']['tokens'].'</th>
+		<th class="text-right">'.$ltmp_arr['index']['amount'].'</th>
 	</tr>';
 	print '</thead>';
 	print '<tbody>';
 	print '<tr>
-	<td>Ликвидные</td>
+	<td>'.$ltmp_arr['index']['liquid'].'</td>
 	<td class="text-right">
 	<a href="/accounts/?type=tokens&page=1">
 	'.short_viz(($dgp['current_supply']-$dgp['total_vesting_fund']-$dgp['committee_fund']-$dgp['total_reward_fund']-$escrow_tokens_sum)/1000,false).'
 	</a>
 	</td></tr>';
 	print '<tr>
-	<td>В капитале</td>
+	<td>'.$ltmp_arr['index']['in_capital'].'</td>
 	<td class="text-right">
 	<a href="/accounts/?type=shares&page=1">
 	'.short_viz($dgp['total_vesting_fund']/1000,false).'
 	</a>
 	</td></tr>';
 	print '<tr>
-	<td>Фонд ДАО</td>
+	<td>'.$ltmp_arr['index']['dao_fund'].'</td>
 	<td class="text-right">'.short_viz($dgp['committee_fund']/1000,false).'</td></tr>';
 	print '<tr>
-	<td>Фонд наград</td>
+	<td>'.$ltmp_arr['index']['reward_fund'].'</td>
 	<td class="text-right">'.short_viz($dgp['total_reward_fund']/1000,false).'</td></tr>';
 	print '<tr>
-	<td class="text-right"><strong>Всего в экономике</strong></td>
+	<td class="text-right"><strong>'.$ltmp_arr['index']['total'].'</strong></td>
 	<td class="text-right"><strong>'.short_viz(($dgp['current_supply']-$escrow_tokens_sum)/1000,false).'</strong></td></tr>';
 	print '<tr>
-	<td>Замороженные</td>
+	<td>'.$ltmp_arr['index']['freezed'].'</td>
 	<td class="text-right">'.short_viz($escrow_tokens_sum/1000,false).'</td></tr>';
 	print '<tr>
-	<td class="text-right"><strong><em>Всего</em></strong></td>
+	<td class="text-right"><strong><em>'.$ltmp_arr['index']['summary'].'</em></strong></td>
 	<td class="text-right"><strong><em>'.short_viz($dgp['current_supply']/1000,false).'</em></strong></td></tr>';
 	print '</tbody></table>';
 	print '</div>';
@@ -939,8 +892,8 @@ if(''==$path_array[1]){
 	print '<thead>';
 	print '
 	<tr>
-		<th>Эмиссия</th>
-		<th width="40%">Значение</th>
+		<th>'.$ltmp_arr['index']['emission'].'</th>
+		<th width="40%">'.$ltmp_arr['index']['value'].'</th>
 	</tr>';
 	print '</thead>';
 	print '<tbody>';
@@ -955,12 +908,12 @@ if(''==$path_array[1]){
 			$new_supply+=$emission;
 		}
 	}
-	print '<tr><td>Фонд наград</td><td>'.round(((10000 - $dgp['inflation_witness_percent'] - (10000 - $dgp['inflation_witness_percent'])*$dgp['inflation_ratio']/10000)) /100,2).'%</td></tr>';
-	print '<tr><td>Фонд ДАО</td><td>'.round(((10000 - $dgp['inflation_witness_percent'])*$dgp['inflation_ratio']/10000) /100,2).'%</td></tr>';
-	print '<tr><td>Делегаты</td><td>'.round($dgp['inflation_witness_percent']/100,2).'%</td></tr>';
-	print '<tr><td class="nowrap">Срок фиксации</td><td>'.round($chain_props['inflation_recalc_period']*3/3600/24,2).' сут.</td></tr>';
-	print '<tr><td class="nowrap">Пересчёт распределения</td><td class="nowrap">'.date('d.m.y H:i',($dgp['time']+(($dgp_json['inflation_calc_block_num']+$chain_props['inflation_recalc_period']-$dgp['head_block_number'])*3))).' GMT</td></tr>';
-	print '<tr><td class="nowrap"><strong>Всего в год</strong></td><td><strong>'.short_viz($emission/1000,true).'</strong></td></tr>';
+	print '<tr><td>'.$ltmp_arr['index']['reward_fund'].'</td><td>'.round(((10000 - $dgp['inflation_witness_percent'] - (10000 - $dgp['inflation_witness_percent'])*$dgp['inflation_ratio']/10000)) /100,2).'%</td></tr>';
+	print '<tr><td>'.$ltmp_arr['index']['dao_fund'].'</td><td>'.round(((10000 - $dgp['inflation_witness_percent'])*$dgp['inflation_ratio']/10000) /100,2).'%</td></tr>';
+	print '<tr><td>'.$ltmp_arr['index']['witnesses'].'</td><td>'.round($dgp['inflation_witness_percent']/100,2).'%</td></tr>';
+	print '<tr><td class="nowrap">'.$ltmp_arr['index']['fixation_period'].'</td><td>'.round($chain_props['inflation_recalc_period']*3/3600/24,2).' '.$ltmp_arr['index']['days'].'</td></tr>';
+	print '<tr><td class="nowrap">'.$ltmp_arr['index']['recalculation'].'</td><td class="nowrap">'.date('d.m.y H:i',($dgp['time']+(($dgp_json['inflation_calc_block_num']+$chain_props['inflation_recalc_period']-$dgp['head_block_number'])*3))).' GMT</td></tr>';
+	print '<tr><td class="nowrap"><strong>'.$ltmp_arr['index']['total_per_year'].'</strong></td><td><strong>'.short_viz($emission/1000,true).'</strong></td></tr>';
 	print '</tbody></table>';
 	print '</div>';
 
@@ -986,62 +939,62 @@ if(''==$path_array[1]){
 	print '</tbody></table>';
 	*/
 
-	print '<br><h2 class="left">Делегатские параметры</h2>';
+	print '<br><h2 class="left">'.$ltmp_arr['index']['witnesses_props'].'</h2>';
 	print '<table class="chain-props captions sortable-theme-slick" width="100%" data-sortable="false">';
 	print '<thead>';
 	print '
 	<tr>
-		<th>Параметр</th>
-		<th>Значение</th>
+		<th>'.$ltmp_arr['index']['witnesses_props_name'].'</th>
+		<th>'.$ltmp_arr['index']['witnesses_props_value'].'</th>
 	</tr>';
 	print '</thead>';
 	print '<tbody>';
-	print '<tr><td>Стоимость создания аккаунта</td>
+	print '<tr><td>'.$ltmp_arr['props_descr']['account_creation_fee'].'</td>
 	<td><a href="/props/account_creation_fee/">'.short_viz($chain_props['account_creation_fee']/1000,true).'</a></td></tr>';
-	print '<tr><td>Стоимость создания аккаунта делегированием</td>
+	print '<tr><td>'.$ltmp_arr['props_descr']['create_account_delegation_ratio'].'</td>
 	<td><a href="/props/create_account_delegation_ratio/">'.short_viz($chain_props['account_creation_fee']*$chain_props['create_account_delegation_ratio']/1000,true).'</a></td></tr>';
-	print '<tr><td>Срок делегирования при создании аккаунта</td>
-	<td><a href="/props/create_account_delegation_time/">'.($chain_props['create_account_delegation_time']/3600/24).' сут.</a></td></tr>';
-	print '<tr><td>Резерв пропускной способности для микроаккаунтов</td>
-	<td><a href="/props/bandwidth_reserve_percent/">'.round($chain_props['bandwidth_reserve_percent']/100,2).'%</a></td></tr>';
-	print '<tr><td>Максимальный капитал микроаккаунта</td>
+	print '<tr><td>'.$ltmp_arr['props_descr']['create_account_delegation_time'].'</td>
+	<td><a href="/props/create_account_delegation_time/">'.($chain_props['create_account_delegation_time']/3600/24).' '.$props_list_item['create_account_delegation_time'].'</a></td></tr>';
+	print '<tr><td>'.$ltmp_arr['props_descr']['bandwidth_reserve_percent'].'</td>
+	<td><a href="/props/bandwidth_reserve_percent/">'.round($chain_props['bandwidth_reserve_percent']/100,2).''.$props_list_item['bandwidth_reserve_percent'].'</a></td></tr>';
+	print '<tr><td>'.$ltmp_arr['props_descr']['bandwidth_reserve_below'].'</td>
 	<td><a href="/props/bandwidth_reserve_below/">'.short_viz($chain_props['bandwidth_reserve_below']/1000000,true).'</a></td></tr>';
 
-	print '<tr><td>Максимальный размер блока</td>
-	<td class="nowrap"><a href="/props/maximum_block_size/">'.$chain_props['maximum_block_size'].' байт</a></td></tr>';
+	print '<tr><td>'.$ltmp_arr['props_descr']['maximum_block_size'].'</td>
+	<td class="nowrap"><a href="/props/maximum_block_size/">'.$chain_props['maximum_block_size'].' '.$props_list_item['maximum_block_size'].'</a></td></tr>';
 
-	print '<tr><td>Дополнительная наценка пропускной способности за каждую data операцию в транзакции</td>
-	<td><a href="/props/data_operations_cost_additional_bandwidth/">'.round($chain_props['data_operations_cost_additional_bandwidth']/100,2).'%</a></td></tr>';
-	print '<tr><td>Минимальное количество токенов при делегировании</td>
+	print '<tr><td>'.$ltmp_arr['props_descr']['data_operations_cost_additional_bandwidth'].'</td>
+	<td><a href="/props/data_operations_cost_additional_bandwidth/">'.round($chain_props['data_operations_cost_additional_bandwidth']/100,2).''.$props_list_item['data_operations_cost_additional_bandwidth'].'</a></td></tr>';
+	print '<tr><td>'.$ltmp_arr['props_descr']['min_delegation'].'</td>
 	<td><a href="/props/min_delegation/">'.short_viz($chain_props['min_delegation']/1000,true).'</a></td></tr>';
-	print '<tr><td>Минимальный размер награждающего капитала</td>
+	print '<tr><td>'.$ltmp_arr['props_descr']['vote_accounting_min_rshares'].'</td>
 	<td><a href="/props/vote_accounting_min_rshares/">'.short_viz($chain_props['vote_accounting_min_rshares']/1000000,true).'</a></td></tr>';
-	print '<tr><td>Минимальная доля совокупного социального капитала для решения по заявке в Фонде ДАО</td>
-	<td><a href="/props/committee_request_approve_min_percent/">'.round($chain_props['committee_request_approve_min_percent']/100).'%</a></td></tr>';
-	print '<tr><td>Штраф делегату за пропуск блока (% суммарного веса голосов за делегата)</td>
-	<td><a href="/props/witness_miss_penalty_percent/">'.round($chain_props['witness_miss_penalty_percent']/100).'%</a></td></tr>';
-	print '<tr><td>Продолжительность штрафа делегату за пропуск блока</td>
-	<td><a href="/props/witness_miss_penalty_duration/">'.($chain_props['witness_miss_penalty_duration']/3600/24).' сут.</a></td></tr>';
-	print '<tr><td>Доля эмиссии, идущая на вознаграждение делегатов</td>
-	<td><a href="/props/inflation_witness_percent/">'.round($chain_props['inflation_witness_percent']/100).'%</a></td></tr>';
-	print '<tr><td>Доля оставшейся эмиссии, идущая в Фонд ДАО</td>
-	<td><a href="/props/inflation_ratio_committee_vs_reward_fund/">'.round($chain_props['inflation_ratio_committee_vs_reward_fund']/100).'%</a></td></tr>';
-	print '<tr><td>Срок фиксации эмиссионной модели</td>
-	<td><a href="/props/inflation_recalc_period/">'.round($chain_props['inflation_recalc_period']*3/3600/24).' сут.</a></td></tr>';
+	print '<tr><td>'.$ltmp_arr['props_descr']['committee_request_approve_min_percent'].'</td>
+	<td><a href="/props/committee_request_approve_min_percent/">'.round($chain_props['committee_request_approve_min_percent']/100).''.$props_list_item['committee_request_approve_min_percent'].'</a></td></tr>';
+	print '<tr><td>'.$ltmp_arr['props_descr']['witness_miss_penalty_percent'].'</td>
+	<td><a href="/props/witness_miss_penalty_percent/">'.round($chain_props['witness_miss_penalty_percent']/100).''.$props_list_item['witness_miss_penalty_percent'].'</a></td></tr>';
+	print '<tr><td>'.$ltmp_arr['props_descr']['witness_miss_penalty_duration'].'</td>
+	<td><a href="/props/witness_miss_penalty_duration/">'.($chain_props['witness_miss_penalty_duration']/3600/24).' '.$props_list_item['witness_miss_penalty_duration'].'</a></td></tr>';
+	print '<tr><td>'.$ltmp_arr['props_descr']['inflation_witness_percent'].'</td>
+	<td><a href="/props/inflation_witness_percent/">'.round($chain_props['inflation_witness_percent']/100).''.$props_list_item['inflation_witness_percent'].'</a></td></tr>';
+	print '<tr><td>'.$ltmp_arr['props_descr']['inflation_ratio_committee_vs_reward_fund_short'].'</td>
+	<td><a href="/props/inflation_ratio_committee_vs_reward_fund/">'.round($chain_props['inflation_ratio_committee_vs_reward_fund']/100).''.$props_list_item['inflation_ratio_committee_vs_reward_fund'].'</a></td></tr>';
+	print '<tr><td>'.$ltmp_arr['props_descr']['inflation_recalc_period'].'</td>
+	<td><a href="/props/inflation_recalc_period/">'.round($chain_props['inflation_recalc_period']*3/3600/24).' '.$props_list_item['inflation_recalc_period'].'</a></td></tr>';
 
-	print '<tr><td>Минимальная сумма чека</td>
+	print '<tr><td>'.$ltmp_arr['props_descr']['create_invite_min_balance'].'</td>
 	<td><a href="/props/create_invite_min_balance/">'.short_viz($chain_props['create_invite_min_balance']/1000,true).'</a></td></tr>';
-	print '<tr><td>Плата за создание заявки в Фонд ДАО</td>
+	print '<tr><td>'.$ltmp_arr['props_descr']['committee_create_request_fee'].'</td>
 	<td><a href="/props/committee_create_request_fee/">'.short_viz($chain_props['committee_create_request_fee']/1000,true).'</a></td></tr>';
-	print '<tr><td>Плата за создание платной подписки</td>
+	print '<tr><td>'.$ltmp_arr['props_descr']['create_paid_subscription_fee'].'</td>
 	<td><a href="/props/create_paid_subscription_fee/">'.short_viz($chain_props['create_paid_subscription_fee']/1000,true).'</a></td></tr>';
-	print '<tr><td>Плата за выставление аккаунта на продажу</td>
+	print '<tr><td>'.$ltmp_arr['props_descr']['account_on_sale_fee'].'</td>
 	<td><a href="/props/account_on_sale_fee/">'.short_viz($chain_props['account_on_sale_fee']/1000,true).'</a></td></tr>';
-	print '<tr><td>Плата за выставление субаккаунтов на продажу</td>
+	print '<tr><td>'.$ltmp_arr['props_descr']['subaccount_on_sale_fee'].'</td>
 	<td><a href="/props/subaccount_on_sale_fee/">'.short_viz($chain_props['subaccount_on_sale_fee']/1000,true).'</a></td></tr>';
-	print '<tr><td>Плата за объявление аккаунта делегатом</td>
+	print '<tr><td>'.$ltmp_arr['props_descr']['witness_declaration_fee'].'</td>
 	<td><a href="/props/witness_declaration_fee/">'.short_viz($chain_props['witness_declaration_fee']/1000,true).'</a></td></tr>';
-	print '<tr><td>Количество периодов (дней) уменьшения капитала</td>
+	print '<tr><td>'.$ltmp_arr['props_descr']['withdraw_intervals'].'</td>
 	<td><a href="/props/withdraw_intervals/">'.$chain_props['withdraw_intervals'].'</a></td></tr>';
 	print '</tbody></table>';
 	/*
@@ -1054,13 +1007,14 @@ if(''==$path_array[1]){
 	print '</div></div></div>';
 }
 else{
+	header('HTTP/1.1 404 Not Found');
 	print '
 	<div class="cards-view">
 		<div class="cards-container">
 
 			<div class="card">
-				<h3 class="captions">Test</h3>
-				<p>В разработке...</p>
+				<h3 class="captions">'.$ltmp_arr['index']['error'].'</h3>
+				<p>'.$ltmp_arr['index']['page_not_found'].'</p>
 			</div>
 
 		</div>

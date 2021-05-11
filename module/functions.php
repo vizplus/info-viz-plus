@@ -1,5 +1,4 @@
 <?php
-include('ltmp.php');
 function raw_string($str){
 	$length=dechex(strlen($str));
 	if(strlen($length)%2!=0){
@@ -753,9 +752,13 @@ function hash_view($hash,$full=false){
 	return '<span class="view-hash captions">'.$hash_str.'</span>';
 }
 
+
+//include('ltmp.php');
+/*
 function ltmp($ltmp_str,$ltmp_args=array()){
 	foreach($ltmp_args as $k=>$v){
 		$ltmp_str=str_replace('%'.$k.'%',$v,$ltmp_str);
 	}
 	return $ltmp_str;
 }
+*/

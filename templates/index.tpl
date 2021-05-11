@@ -33,6 +33,7 @@
 </div>
 <div class="horizontal-view vertical-view">
 	{content}
+	{select-lang}
 </div>
 </body>
 </html>

@@ -349,11 +349,12 @@ while($work){
 			$db->sql("UPDATE `ops` SET `initiator`='".$account_id."', `target`='".$target_id."' WHERE `id`='".$op_arr['id']."'");
 		}
 		elseif(48==$op_arr['type']){//account_sale
-			$account_id=parse_account($op_json['buyer']);
+			$account_id=parse_account($op_json['account']);
 			$target_id=parse_account($op_json['seller']);
+			$buyer_id=parse_account($op_json['buyer']);
 			$db->sql("UPDATE `accounts` SET `update`=1 WHERE `id`='".$account_id."'");
 			$db->sql("UPDATE `accounts` SET `update`=1 WHERE `id`='".$target_id."'");
-			$db->sql("UPDATE `ops` SET `initiator`='".$account_id."', `target`='".$target_id."' WHERE `id`='".$op_arr['id']."'");
+			$db->sql("UPDATE `ops` SET `initiator`='".$account_id."', `target`='".$target_id."', `memo`='".$buyer_id."' WHERE `id`='".$op_arr['id']."'");
 		}
 		elseif(49==$op_arr['type']){//escrow_transfer
 			$account_id=parse_account($op_json['from']);

@@ -1,5 +1,8 @@
 <?php
 error_reporting(255);
+if(!isset($_SERVER['PWD'])){
+	exit;
+}
 if(!$_SERVER['PWD']){
 	exit;
 }
@@ -20,12 +23,12 @@ $new_pid=posix_getpid();
 if($pid){
 	$working=posix_getpgid($pid);
 	if($working){
-		print 'VIZ backup already working with PID: '.$pid.PHP_EOL;
+		print 'VIZ Ops linking already working with PID: '.$pid.PHP_EOL;
 		exit;
 	}
 	else{
 		unlink($pid_file);
-		print 'VIZ backup stopped, restarting... with PID: '.$new_pid.PHP_EOL;
+		print 'VIZ Ops linking stopped, restarting... with PID: '.$new_pid.PHP_EOL;
 	}
 }
 file_put_contents($pid_file,$new_pid);
