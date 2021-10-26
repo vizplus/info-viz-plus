@@ -1,5 +1,6 @@
 <?php
 $ltmp_preset['en']=[
+	'active'=>true,
 	'meta'=>[
 		'description'=>'All actual information and statistics on the VIZ blockchain: block explorer, delegates, accounts',
 	],

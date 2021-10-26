@@ -203,6 +203,10 @@ while($work){
 			$work=false;
 		}
 	}
+	if((time() - $start_time) >= 3590){//1 hour
+		print 'Work ≈60 min, reboot...'.PHP_EOL;
+		exit;
+	}
 }
 print 'INFO: PID file was deleted, self-terminating...'.PHP_EOL;
 exit;
