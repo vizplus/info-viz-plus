@@ -26,3 +26,5 @@ foreach($ltmp_base as $lang_el){
 	}
 }
 $replace['select-lang']='<div class="select-lang captions">'.implode(' / ',$select_lang_arr).'</div>';
+
+$replace['head_addon'].="<script>var selected_lang='".$ltmp_current."';</script>";

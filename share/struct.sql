@@ -344,3 +344,21 @@ CREATE TABLE `witnesses_votes` (
   KEY `witness` (`witness`),
   KEY `witness_votes` (`witness`,`votes`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `invites`;
+CREATE TABLE `invites` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `time` int(11) NOT NULL DEFAULT 0,
+  `creator` int(11) NOT NULL DEFAULT 0,
+  `balance` bigint(20) NOT NULL DEFAULT 0,
+  `invite_key` varchar(53) NOT NULL DEFAULT '',
+  `status` tinyint(1) NOT NULL DEFAULT 0,
+  `claim_time` int(11) NOT NULL DEFAULT 0,
+  `initiator` int(11) NOT NULL DEFAULT 0,
+  `receiver` int(11) NOT NULL DEFAULT 0,
+  `secret_key` varchar(51) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `invite_key` (`invite_key`),
+  KEY `secret_key` (`secret_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -1,3 +1,31 @@
+var ltmp_preset=[];
+ltmp_preset['en']={
+	invites:{
+		balance:'balance',
+		created:'created',
+		time_str_prepand:' in ',
+		status:{
+			0:'not used',
+			1:'used for registration',
+			2:'claimed',
+			3:'claimed in capital',
+		},
+	},
+}
+ltmp_preset['ru']={
+	invites:{
+		balance:'баланс',
+		created:'создан',
+		time_str_prepand:' в ',
+		status:{
+			0:'не использован',
+			1:'использован для регистрации',
+			2:'погашен',
+			3:'погашен в капитал',
+		},
+	},
+}
+var ltmp_arr=ltmp_preset[selected_lang];
 function ajax_update_accounts_table(type,search,page){
 	if(typeof type==='undefined'){
 		type=$('.accounts-table').attr('data-type');
@@ -184,7 +212,138 @@ function check_load_more(){
 var search_timestep=500;
 var accounts_search_timer=0;
 var ops_history_search_timer=0;
+
+var invite_status=ltmp_arr.invites.status;
+
+function fast_str_replace(search,replace,str){
+	return str.split(search).join(replace);
+}
+function show_date(str,add_time,add_seconds,remove_today,time_str_prepand){
+	time_str_prepand=typeof time_str_prepand==='undefined'?' ':time_str_prepand;
+	str=typeof str==='undefined'?false:str;
+	add_time=typeof add_time==='undefined'?false:add_time;
+	add_seconds=typeof add_seconds==='undefined'?false:add_seconds;
+	remove_today=typeof remove_today==='undefined'?false:remove_today;
+	var str_date;
+	if(!str){
+		str_date=new Date();
+	}
+	else{
+		let str_time=0;
+		if(typeof str=='number'){
+			str_time=str;
+		}
+		else{
+			str_time=Date.parse(str);
+		}
+		str_date=new Date(str_time);
+		console.log(str,typeof str,str_time,typeof str_time,str_date);
+	}
+	//let str_time=parseInt(str_date/1000);
+	//let time_offset=parseInt((new Date().getTime() - str_date+(new Date().getTimezoneOffset()*60000))/1000);
+	var day=str_date.getDate();
+	if(day<10){
+		day='0'+day;
+	}
+	var month=str_date.getMonth()+1;
+	if(month<10){
+		month='0'+month;
+	}
+	var minutes=str_date.getMinutes();
+	if(minutes<10){
+		minutes='0'+minutes;
+	}
+	var hours=str_date.getHours();
+	if(hours<10){
+		hours='0'+hours;
+	}
+	var seconds=str_date.getSeconds();
+	if(seconds<10){
+		seconds='0'+seconds;
+	}
+	var datetime_str=day+'.'+month+'.'+str_date.getFullYear();
+	if(add_time){
+		datetime_str+=time_str_prepand;
+		datetime_str+=hours+':'+minutes;
+		if(add_seconds){
+			datetime_str+=':'+seconds;
+		}
+	}
+	if(remove_today){
+		datetime_str=fast_str_replace(show_date()+' ','',datetime_str);
+	}
+	return datetime_str;
+}
+function app_mouse(e){
+	if(!e)e=window.event;
+	var target=e.target || e.srcElement;
+	if($(target).hasClass('check-invite-public-action')){
+		let public_key=$(target).text();
+		$('.check-invite-public-info[rel="'+public_key+'"]').remove();
+		var xhr = new XMLHttpRequest();
+		xhr.overrideMimeType('text/plain');
+		xhr.open('GET','/ajax/check-invite-public/'+public_key+'/',true);
+		xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+		xhr.setRequestHeader('accept','application/json, text/plain, */*');
+		xhr.onreadystatechange=function() {
+			if(4==xhr.readyState && 200==xhr.status){
+				var data=JSON.parse(xhr.responseText);
+				if(false!==data.result){
+					$(target).removeClass('check-invite-public-action');
+					let info='';
+					info+=invite_status[data.result.status];
+					if(data.result.status>0){
+						info+=' <a class="view-account" href="/accounts/'+data.result.receiver+'/">'+data.result.receiver+'</a>';
+					}
+					let claim_time=parseInt(data.result.claim_time);
+					if(claim_time>0){
+						info+=' '+show_date(claim_time*1000+(new Date().getTimezoneOffset()*60000),true,false,true,ltmp_arr.invites.time_str_prepand)+' GMT';
+					}
+					$(target).after('<span class="check-invite-public-info" rel="'+public_key+'">('+info+')');
+				}
+			}
+			if(4==xhr.readyState && 200!=xhr.status){
+				$(target).after('<span class="check-invite-public-info" rel="'+public_key+'">(error)');
+			}
+		};
+		xhr.onerror = function() {
+			$(target).after('<span class="check-invite-public-info" rel="'+public_key+'">(error)');
+		};
+		xhr.send();
+	}
+	if($(target).hasClass('check-invite-secret-action')){
+		let secret_key=$(target).text();
+		$('.check-invite-secret-info[rel="'+secret_key+'"]').remove();
+		var xhr = new XMLHttpRequest();
+		xhr.overrideMimeType('text/plain');
+		xhr.open('GET','/ajax/check-invite-secret/'+secret_key+'/',true);
+		xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+		xhr.setRequestHeader('accept','application/json, text/plain, */*');
+		xhr.onreadystatechange=function() {
+			if(4==xhr.readyState && 200==xhr.status){
+				var data=JSON.parse(xhr.responseText);
+				if(false!==data.result){
+					$(target).removeClass('check-invite-secret-action');
+					let info='';
+					info+=ltmp_arr.invites.balance+' <span class="view-tokens">'+parseFloat(parseInt(data.result.balance)/100).toFixed(2)+' viz</span>';
+					info+=', '+ltmp_arr.invites.created+' <a class="view-account" href="/accounts/'+data.result.creator+'/">'+data.result.creator+'</a>';
+					$(target).after('<span class="check-invite-secret-info" rel="'+secret_key+'">('+info+')');
+				}
+			}
+			if(4==xhr.readyState && 200!=xhr.status){
+				$(target).after('<span class="check-invite-secret-info" rel="'+secret_key+'">(error)');
+			}
+		};
+		xhr.onerror = function() {
+			$(target).after('<span class="check-invite-secret-info" rel="'+secret_key+'">(error)');
+		};
+		xhr.send();
+	}
+}
 $(document).ready(function(){
+	document.addEventListener('click', app_mouse, false);
+	document.addEventListener('tap', app_mouse, false);
+
 	$('.index-charts-selector').bind('click',function(){
 		let chart=$(this).attr('rel');
 		$('.index-charts').removeClass('selected');

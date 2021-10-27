@@ -5,6 +5,7 @@ include($site_root.'/class/viz_keys.php');
 include($site_root.'/class/db.php');
 include($site_root.'/class/sdb.php');
 include($site_root.'/class/template.php');
+include($site_root.'/class/autoloader.php');
 //include($site_root.'/class/dme.php');
 //include($site_root.'/class/cache.php');
 

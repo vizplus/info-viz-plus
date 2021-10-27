@@ -14,6 +14,44 @@ if('check-login-available'==$path_array[2]){
 	}
 	exit;
 }
+if('check-invite-public'==$path_array[2]){
+	header("Content-type:text/html; charset=UTF-8");
+	header('HTTP/1.1 200 Ok');
+	$result=$db->sql_row("SELECT * FROM `invites` WHERE `invite_key`='".$db->prepare($path_array[3])."'");
+	if($result){
+		$result['creator']=get_account_name($result['creator']);
+		if($result['initiator']){
+			$result['initiator']=get_account_name($result['initiator']);
+		}
+		if($result['receiver']){
+			$result['receiver']=get_account_name($result['receiver']);
+		}
+		print json_encode(['result'=>$result]);
+	}
+	else{
+		print json_encode(['result'=>false]);
+	}
+	exit;
+}
+if('check-invite-secret'==$path_array[2]){
+	header("Content-type:text/html; charset=UTF-8");
+	header('HTTP/1.1 200 Ok');
+	$result=$db->sql_row("SELECT * FROM `invites` WHERE `secret_key`='".$db->prepare($path_array[3])."'");
+	if($result){
+		$result['creator']=get_account_name($result['creator']);
+		if($result['initiator']){
+			$result['initiator']=get_account_name($result['initiator']);
+		}
+		if($result['receiver']){
+			$result['receiver']=get_account_name($result['receiver']);
+		}
+		print json_encode(['result'=>$result]);
+	}
+	else{
+		print json_encode(['result'=>false]);
+	}
+	exit;
+}
 if('ops-history'==$path_array[2]){
 	header("Content-type:text/html; charset=UTF-8");
 	header('HTTP/1.1 200 Ok');

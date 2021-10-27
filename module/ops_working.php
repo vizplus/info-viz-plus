@@ -59,6 +59,12 @@ $op_types_arr=[
 		'55',//escrow_dispute
 		'57',//expire_escrow_ratification
 	],
+	'invites'=>[
+		'24',//create_invite
+		'26',//invite_registration
+		'30',//claim_invite_balance
+		'56',//use_invite_balance
+	]
 ];
 $work_ops_types=[];
 foreach($op_types_arr as $work_type=>$work_ops_types_arr){
@@ -79,6 +85,48 @@ while($work){
 	$op_q=$db->sql("SELECT `id`,`type`,`json`,`time` FROM `ops` WHERE ".$work_ops_str." `worked`=0 LIMIT 10");// ORDER BY `id` ASC
 	while($op_arr=$db->row($op_q)){
 		foreach($op_types_arr as $work_type=>$work_ops_types_arr){
+			if('invites'==$work_type){
+				if(in_array($op_arr['type'],$work_ops_types_arr)){
+					$op_json=json_decode($op_arr['json'],true);
+					if(24==$op_arr['type']){//create_invite
+						$creator=$op_json['creator'];
+						$creator_id=parse_account($creator);
+						$balance=intval(floatval($op_json['balance'])*100);
+						//VIZ5WRFVYJzUK3NyBnxJnRhupLLMnZfA94QrN6KZAAuARMgYMYa6P
+						//53 chars for public/invite key
+						$invite_key=$op_json['invite_key'];
+
+						$db->sql("INSERT INTO `invites` (`time`,`creator`,`balance`,`invite_key`) VALUES ('".$op_arr['time']."','".(int)$creator_id."','".(int)$balance."','".$db->prepare($invite_key)."')");
+					}
+					if((26==$op_arr['type'])||(30==$op_arr['type'])||(56==$op_arr['type'])){
+						$initiator=$op_json['initiator'];
+						$initiator_id=parse_account($initiator);
+
+						$receiver=(26==$op_arr['type']?$op_json['new_account_name']:$op_json['receiver']);
+						$receiver_id=parse_account($receiver);
+
+						$invite_status=1;
+						if(30==$op_arr['type']){
+							$invite_status=2;
+						}
+						if(56==$op_arr['type']){
+							$invite_status=3;
+						}
+						//5JgT6VBy3jtrRg6WNpq7Fe3xTXkeRp1CZm5JDXuCTZydi4HTcqC
+						//51 chars for private/secret key
+						$invite_secret=$op_json['invite_secret'];
+						//new_account_key prop don't need to invites table
+						$public_key=new VIZ\Key($invite_secret,true);
+						$public_key->to_public();
+						$public_key_str=$public_key->encode();
+
+						$invite_id=$db->select_one('invites','id',"WHERE `invite_key`='".$public_key_str."'");
+						if($invite_id){
+							$db->sql("UPDATE `invites` SET `status`=".$invite_status.", `claim_time`='".$op_arr['time']."', `initiator`=".$initiator_id.", `receiver`=".$receiver_id.", `secret_key`='".$invite_secret."' WHERE `id`='".$invite_id."'");
+						}
+					}
+				}
+			}
 			if('escrow'==$work_type){
 				if(in_array($op_arr['type'],$work_ops_types_arr)){
 					$op_json=json_decode($op_arr['json'],true);
